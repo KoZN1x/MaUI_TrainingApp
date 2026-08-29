@@ -1,40 +1,47 @@
-﻿using MauiTrainApp.Domain.Interfaces;
+﻿using MauiTrainApp.Domain.Entities.Base;
 
 namespace MauiTrainApp.Domain.Entities
 {
-    public sealed record Workout : IEntity
+    public sealed class Workout : BaseEntity
     {
-        public Guid Id { get; init; } = Guid.NewGuid();
+        private readonly List<ExerciseSet> _exerciseSets = [];
 
-        public DateTime CreatedAt {  get; init; } = DateTime.Now;
-
-        public DateTime? UpdatedAt { get; private set; }
-
-        public string Name { get; private set; }
-
-        public string? Description { get; private set; }
+        #region Properties
 
         public DateOnly WorkoutDay { get; private set; } = DateOnly.FromDateTime(DateTime.Now);
 
-        public void SetDescription(string description)
-        {
-            Description = description;
-        }
+        public IReadOnlyCollection<ExerciseSet> ExerciseSets => _exerciseSets.AsReadOnly();
 
-        public void SetName(string name)
-        {
-            Name = name;
-        }
+        #endregion
 
-        public void SetUpdatedTime()
-        {
-            UpdatedAt = DateTime.Now;
-        }
+        #region Methods
 
         public void SetWorkoutDay(DateOnly workoutDay)
         {
             WorkoutDay = workoutDay;
         }
 
+        public void AddExerciseSet(ExerciseSet exerciseSet)
+        {
+            _exerciseSets.Add(exerciseSet);
+
+            SetUpdatedTime();
+        }
+
+        public void RemoveExerciseSet(ExerciseSet exerciseSet)
+        {
+            _exerciseSets.Remove(exerciseSet);
+
+            SetUpdatedTime();
+        }
+
+        public void UpdateExerciseSet(int index, ExerciseSet exerciseSet)
+        {
+            _exerciseSets[index] = exerciseSet;
+
+            SetUpdatedTime();
+        }
+
+        #endregion
     }
 }
