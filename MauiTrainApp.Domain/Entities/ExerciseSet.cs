@@ -22,6 +22,11 @@ namespace MauiTrainApp.Domain.Entities
             Exercise = exercise;
         }
 
+        public void SetWorkingSets(ICollection<WorkingSet> workingSets)
+        {
+            _workingSets.AddRange(workingSets);
+        }
+
         public void AddWorkingSet(WorkingSet workingSet)
         {
             _workingSets.Add(workingSet);

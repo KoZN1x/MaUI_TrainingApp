@@ -21,6 +21,11 @@ namespace MauiTrainApp.Domain.Entities
             WorkoutDay = workoutDay;
         }
 
+        public void SetExerciseSets(ICollection<ExerciseSet> exerciseSets)
+        {
+            _exerciseSets.AddRange(exerciseSets);
+        }
+
         public void AddExerciseSet(ExerciseSet exerciseSet)
         {
             _exerciseSets.Add(exerciseSet);

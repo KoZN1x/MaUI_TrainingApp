@@ -6,6 +6,6 @@
         DateTimeOffset CreatedAt { get; }
         DateTimeOffset? UpdatedAt { get; }
 
-        public void SetUpdatedTime();
+        public void SetUpdatedTime(DateTimeOffset? updatedAt = null);
     }
 }

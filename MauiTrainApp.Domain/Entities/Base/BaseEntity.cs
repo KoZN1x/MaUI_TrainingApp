@@ -16,9 +16,16 @@ namespace MauiTrainApp.Domain.Entities.Base
 
         #region Methods
 
-        public virtual void SetUpdatedTime()
+        public virtual void SetUpdatedTime(DateTimeOffset? updatedAt = null)
         {
-            UpdatedAt = DateTimeOffset.Now;
+            if (updatedAt is null)
+            {
+                UpdatedAt = DateTimeOffset.Now;
+            }
+            else
+            {
+                UpdatedAt = updatedAt.Value;
+            }
         }
 
         #endregion
