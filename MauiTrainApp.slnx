@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="MauiTrainApp.Application/MauiTrainApp.Application.csproj" />
+  <Project Path="MauiTrainApp.Domain/MauiTrainApp.Domain.csproj" />
+  <Project Path="MauiTrainApp.Infrastructure/MauiTrainApp.Infrastructure.csproj" />
+  <Project Path="MauiTrainApp/MauiTrainApp.Client.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
+</Solution>
