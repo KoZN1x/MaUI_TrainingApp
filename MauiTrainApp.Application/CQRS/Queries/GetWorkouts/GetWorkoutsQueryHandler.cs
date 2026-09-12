@@ -1,5 +1,5 @@
-using MauiTrainApp.Core.CQRS;
 using MauiTrainApp.Core.CQRS.Interfaces;
+using MauiTrainApp.Domain.Exceptions;
 using MauiTrainApp.Domain.Interfaces;
 
 namespace MauiTrainApp.Application.CQRS.Queries.GetWorkouts;
@@ -17,6 +17,18 @@ internal sealed class GetWorkoutsQueryHandler : IQueryHandler<GetWorkoutsQuery, 
         GetWorkoutsQuery query,
         CancellationToken cancellationToken = default)
     {
-        return new GetWorkoutsResult(await _workouts.GetByPeriodAsync(query.From, query.To, cancellationToken));
+        if (query.From is { } from && query.To is { } to && to < from)
+        {
+            throw new InvariantException("Period end couldn't be earlier than its start");
+        }
+
+        return new GetWorkoutsResult(query switch
+        {
+            { From: null, To: null } => await _workouts.GetAllAsync(cancellationToken),
+            _ => await _workouts.GetByPeriodAsync(
+                query.From ?? DateOnly.MinValue,
+                query.To ?? DateOnly.MaxValue,
+                cancellationToken)
+        });
     }
 }

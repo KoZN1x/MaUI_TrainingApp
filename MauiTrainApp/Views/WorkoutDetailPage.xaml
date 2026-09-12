@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<base:ContentPageBase
+    x:Class="MauiTrainApp.Views.WorkoutDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:base="clr-namespace:MauiTrainApp.Views.Base"
+    xmlns:controls="clr-namespace:MauiTrainApp.Controls"
+    xmlns:items="clr-namespace:MauiTrainApp.ViewModels.Items"
+    xmlns:viewModels="clr-namespace:MauiTrainApp.ViewModels"
+    x:DataType="viewModels:WorkoutDetailViewModel"
+    Title="{Binding Title}">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <ActivityIndicator
+            Grid.Row="0"
+            HeightRequest="3"
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="{StaticResource Space6}" Spacing="{StaticResource Space6}">
+
+                <VerticalStackLayout Spacing="{StaticResource Space3}">
+                    <Label Style="{StaticResource SectionCaption}" Text="{Binding DayText}" />
+                    <Label Style="{StaticResource Headline}" Text="{Binding Title}" />
+                    <HorizontalStackLayout Spacing="{StaticResource Space2}">
+                        <controls:TagChip Kind="{Binding StatusKind}" Text="{Binding StatusText}" />
+                        <controls:TagChip Kind="Neutral" Text="{Binding VolumeText}" />
+                        <controls:TagChip Kind="Neutral" Text="{Binding DurationText}" />
+                    </HorizontalStackLayout>
+                    <Label Style="{StaticResource Muted}" Text="{Binding WorkingSetText}" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout
+                    BindableLayout.ItemsSource="{Binding Exercises}"
+                    Spacing="{StaticResource Space3}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="items:WorkoutDetailExerciseViewModel">
+                            <Border Style="{StaticResource Card}">
+                                <VerticalStackLayout Spacing="{StaticResource Space3}">
+
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Style="{StaticResource CardTitle}" Text="{Binding Name}" />
+                                        <Label
+                                            Grid.Column="1"
+                                            Style="{StaticResource Muted}"
+                                            Text="{Binding SummaryText}"
+                                            VerticalOptions="Center" />
+                                    </Grid>
+
+                                    <FlexLayout
+                                        BindableLayout.ItemsSource="{Binding WorkingSets}"
+                                        Direction="Row"
+                                        Wrap="Wrap">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate x:DataType="items:WorkingSetChipViewModel">
+                                                <controls:TagChip
+                                                    Margin="0,0,6,6"
+                                                    Kind="{Binding Kind}"
+                                                    Text="{Binding Text}" />
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </FlexLayout>
+
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Button
+            Grid.Row="2"
+            Margin="{StaticResource Space6}"
+            Command="{Binding RepeatCommand}"
+            IsVisible="{Binding CanRepeat}"
+            Style="{StaticResource PrimaryButton}"
+            Text="Повторить эту тренировку" />
+
+    </Grid>
+
+</base:ContentPageBase>

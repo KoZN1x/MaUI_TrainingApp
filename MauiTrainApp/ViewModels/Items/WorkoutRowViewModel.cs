@@ -8,6 +8,7 @@ namespace MauiTrainApp.ViewModels.Items
         Guid Id,
         string Title,
         string DayText,
+        string DayShortText,
         string MetaText,
         string TagText,
         TagChipKind TagKind)
@@ -18,10 +19,13 @@ namespace MauiTrainApp.ViewModels.Items
                 ? VolumeConverter.ToText(workout.TotalVolume)
                 : $"{VolumeConverter.ToText(workout.TotalVolume)} · {DurationConverter.ToText(workout.Duration)}";
 
+            var weekday = WorkoutDayConverter.ToWeekday(workout.WorkoutDay);
+
             return new WorkoutRowViewModel(
                 workout.Id,
                 workout.TrainingPlanName ?? "Тренировка",
-                $"{WorkoutDayConverter.ToText(workout.WorkoutDay)}, {WorkoutDayConverter.ToWeekday(workout.WorkoutDay)}",
+                $"{WorkoutDayConverter.ToText(workout.WorkoutDay)}, {weekday}",
+                $"{workout.WorkoutDay.Day} {weekday}",
                 meta,
                 workout.IsCompleted ? "Выполнена" : "Частично",
                 workout.IsCompleted ? TagChipKind.Accent : TagChipKind.Outline);

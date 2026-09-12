@@ -35,7 +35,9 @@ namespace MauiTrainApp.DI
                     .AddTransient<TrainingPlansViewModel>()
                     .AddTransient<WorkoutViewModel>()
                     .AddTransient<ProgressViewModel>()
-                    .AddTransient<ExerciseDetailViewModel>();
+                    .AddTransient<ExerciseDetailViewModel>()
+                    .AddTransient<HistoryViewModel>()
+                    .AddTransient<WorkoutDetailViewModel>();
             }
 
             private IServiceCollection AddPages()
