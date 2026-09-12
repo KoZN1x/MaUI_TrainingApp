@@ -15,14 +15,17 @@
         <ShellContent
             Title="Сегодня"
             ContentTemplate="{DataTemplate views:TodayPage}"
+            Icon="tab_today.png"
             Route="today" />
         <ShellContent
             Title="Планы"
             ContentTemplate="{DataTemplate views:TrainingPlansPage}"
+            Icon="tab_plans.png"
             Route="plans" />
         <ShellContent
             Title="История"
             ContentTemplate="{DataTemplate views:HistoryPage}"
+            Icon="tab_history.png"
             Route="history" />
     </TabBar>
 

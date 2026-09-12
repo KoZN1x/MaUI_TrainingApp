@@ -47,24 +47,33 @@
                             Spacing="{StaticResource Space4}">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="items:WeekDayViewModel">
-                                    <VerticalStackLayout Spacing="{StaticResource Space1}" WidthRequest="32">
-                                        <Label
-                                            FontSize="10"
-                                            HorizontalTextAlignment="Center"
-                                            Style="{StaticResource Muted}"
-                                            Text="{Binding Label}" />
-                                        <Label
-                                            FontSize="14"
-                                            HorizontalTextAlignment="Center"
-                                            Text="{Binding DayNumber}" />
-                                        <BoxView
-                                            BackgroundColor="{StaticResource Accent}"
-                                            CornerRadius="3"
-                                            HeightRequest="6"
-                                            HorizontalOptions="Center"
-                                            IsVisible="{Binding HasWorkout}"
-                                            WidthRequest="6" />
-                                    </VerticalStackLayout>
+                                    <Border
+                                        Padding="6,7"
+                                        BackgroundColor="{Binding Background}"
+                                        Stroke="{Binding Stroke}"
+                                        StrokeShape="RoundRectangle 10"
+                                        StrokeThickness="1"
+                                        WidthRequest="40">
+                                        <VerticalStackLayout Spacing="{StaticResource Space1}">
+                                            <Label
+                                                FontSize="10"
+                                                HorizontalTextAlignment="Center"
+                                                Text="{Binding Label}"
+                                                TextColor="{Binding LabelColor}" />
+                                            <Label
+                                                FontSize="15"
+                                                HorizontalTextAlignment="Center"
+                                                Text="{Binding DayNumber}"
+                                                TextColor="{Binding DayColor}" />
+                                            <BoxView
+                                                BackgroundColor="{Binding MarkColor}"
+                                                CornerRadius="3"
+                                                HeightRequest="6"
+                                                HorizontalOptions="Center"
+                                                IsVisible="{Binding HasWorkout}"
+                                                WidthRequest="6" />
+                                        </VerticalStackLayout>
+                                    </Border>
                                 </DataTemplate>
                             </BindableLayout.ItemTemplate>
                         </HorizontalStackLayout>
