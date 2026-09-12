@@ -1,8 +1,9 @@
 using MauiTrainApp.Application.DI;
 using MauiTrainApp.Core.ExceptionHandler;
-using MauiTrainApp.ExceptionHandler;
 using MauiTrainApp.ExceptionHandler.Interfaces;
+using MauiTrainApp.ExceptionHandler;
 using MauiTrainApp.Infrastructure.DI;
+using MauiTrainApp.Startup;
 using Microsoft.Extensions.Logging;
 
 namespace MauiTrainApp
@@ -25,7 +26,8 @@ namespace MauiTrainApp
             builder.Services
                 .AddInfrastructure(Path.Combine(FileSystem.AppDataDirectory, DatabaseFileName))
                 .AddApplication()
-                .AddSingleton<IExceptionPresenter, DialogExceptionPresenter>();
+                .AddSingleton<IExceptionPresenter, DialogExceptionPresenter>()
+                .AddSingleton<AppStartup>();
 
 #if DEBUG
     		builder.Logging.AddDebug();
@@ -34,8 +36,6 @@ namespace MauiTrainApp
             var app = builder.Build();
 
             app.Services.UseGlobalExceptionHandling();
-
-            Task.Run(() => app.Services.MigrateDatabaseAsync()).GetAwaiter().GetResult();
 
             return app;
         }

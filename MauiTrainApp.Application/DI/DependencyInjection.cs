@@ -6,6 +6,8 @@ using MauiTrainApp.Application.CQRS.Commands.DeleteExercise;
 using MauiTrainApp.Application.CQRS.Commands.DeleteTrainingPlan;
 using MauiTrainApp.Application.CQRS.Commands.DeleteWorkout;
 using MauiTrainApp.Application.CQRS.Commands.StartWorkoutFromPlan;
+using MauiTrainApp.Application.CQRS.Commands.UpdatePerformedWorkingSet;
+using MauiTrainApp.Application.CQRS.Commands.UpdatePlannedExerciseSet;
 using MauiTrainApp.Application.CQRS.Queries.GetExercises;
 using MauiTrainApp.Application.CQRS.Queries.GetTrainingPlanDetails;
 using MauiTrainApp.Application.CQRS.Queries.GetTrainingPlans;
@@ -41,7 +43,9 @@ namespace MauiTrainApp.Application.DI
                     .AddCommand<StartWorkoutFromPlanCommand, StartWorkoutFromPlanResult, StartWorkoutFromPlanCommandHandler>()
                     .AddCommand<CompleteWorkingSetCommand, CompleteWorkingSetResult, CompleteWorkingSetCommandHandler>()
                     .AddCommand<CompleteExerciseSetCommand, CompleteExerciseSetResult, CompleteExerciseSetCommandHandler>()
-                    .AddCommand<DeleteWorkoutCommand, DeleteWorkoutResult, DeleteWorkoutCommandHandler>();
+                    .AddCommand<DeleteWorkoutCommand, DeleteWorkoutResult, DeleteWorkoutCommandHandler>()
+                    .AddCommand<UpdatePlannedExerciseSetCommand, UpdatePlannedExerciseSetResult, UpdatePlannedExerciseSetCommandHandler>()
+                    .AddCommand<UpdatePerformedWorkingSetCommand, UpdatePerformedWorkingSetResult, UpdatePerformedWorkingSetCommandHandler>();
             }
 
             private IServiceCollection AddQueries()

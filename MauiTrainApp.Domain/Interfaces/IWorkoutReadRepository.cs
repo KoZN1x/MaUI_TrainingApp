@@ -1,5 +1,4 @@
 using MauiTrainApp.Domain.ReadModels;
-using MauiTrainApp.Domain.Interfaces;
 
 namespace MauiTrainApp.Domain.Interfaces;
 
@@ -13,4 +12,6 @@ public interface IWorkoutReadRepository : IReadRepository<WorkoutListItemReadMod
     Task<IReadOnlyCollection<WorkoutListItemReadModel>> GetByTrainingPlanAsync(
         Guid trainingPlanId,
         CancellationToken cancellationToken = default);
+
+    Task<Guid?> GetLastWorkoutIdAsync(Guid trainingPlanId, CancellationToken cancellationToken = default);
 }

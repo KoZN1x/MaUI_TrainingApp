@@ -2,6 +2,7 @@ using MauiTrainApp.Domain.Interfaces;
 using MauiTrainApp.Domain.Entities;
 using MauiTrainApp.Domain.Interfaces;
 using MauiTrainApp.Infrastructure.Database;
+using MauiTrainApp.Infrastructure.Database.Seeding;
 using MauiTrainApp.Infrastructure.Interfaces;
 using MauiTrainApp.Infrastructure.Mappers;
 using MauiTrainApp.Infrastructure.Records;
@@ -28,7 +29,8 @@ namespace MauiTrainApp.Infrastructure.DI
                 return services
                     .AddMappers()
                     .AddWriteRepositories()
-                    .AddReadRepositories();
+                    .AddReadRepositories()
+                    .AddScoped<DatabaseSeeder>();
             }
 
             private IServiceCollection AddMappers()

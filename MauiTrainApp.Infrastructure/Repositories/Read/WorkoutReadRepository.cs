@@ -11,6 +11,8 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
         : ReadRepositoryBase<WorkoutRecord, WorkoutListItemReadModel, WorkoutDetailsReadModel>,
           IWorkoutReadRepository
     {
+        private const int SameDayCandidates = 20;
+
         public WorkoutReadRepository(MauiTrainAppDbContext dbContext)
             : base(dbContext)
         {
@@ -33,6 +35,24 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
             return ListAsync(
                 Query.Where(x => x.TrainingPlanRecordId == trainingPlanId),
                 cancellationToken);
+        }
+
+        public async Task<Guid?> GetLastWorkoutIdAsync(
+            Guid trainingPlanId,
+            CancellationToken cancellationToken = default)
+        {
+            var candidates = await Query
+                .Where(x => x.TrainingPlanRecordId == trainingPlanId)
+                .OrderByDescending(x => x.WorkoutDay)
+                .Select(x => new { x.Id, x.WorkoutDay, x.CreatedAt })
+                .Take(SameDayCandidates)
+                .ToListAsync(cancellationToken);
+
+            return candidates
+                .OrderByDescending(x => x.WorkoutDay)
+                .ThenByDescending(x => x.CreatedAt)
+                .Select(x => (Guid?)x.Id)
+                .FirstOrDefault();
         }
 
         protected override async Task<IReadOnlyCollection<WorkoutListItemReadModel>> ListAsync(
