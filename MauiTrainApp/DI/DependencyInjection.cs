@@ -2,6 +2,8 @@ using MauiTrainApp.ExceptionHandler;
 using MauiTrainApp.ExceptionHandler.Interfaces;
 using MauiTrainApp.Navigation;
 using MauiTrainApp.Navigation.Interfaces;
+using MauiTrainApp.Services;
+using MauiTrainApp.Services.Interfaces;
 using MauiTrainApp.Startup;
 using MauiTrainApp.ViewModels;
 using MauiTrainApp.Views;
@@ -19,6 +21,7 @@ namespace MauiTrainApp.DI
                     .AddSingleton<IExceptionPresenter, DialogExceptionPresenter>()
                     .AddSingleton<INavigator, ShellNavigator>()
                     .AddSingleton<AppStartup>()
+                    .AddTransient<IWorkoutClock, WorkoutClock>()
                     .AddViewModels()
                     .AddPages();
             }
@@ -33,8 +36,15 @@ namespace MauiTrainApp.DI
             private IServiceCollection AddPages()
             {
                 return services
+                    .AddTransient<TodayPage>()
                     .AddTransient<TrainingPlansPage>()
-                    .AddTransient<WorkoutPage>();
+                    .AddTransient<HistoryPage>()
+                    .AddTransient<WorkoutPage>()
+                    .AddTransient<WorkoutDetailPage>()
+                    .AddTransient<ProgressPage>()
+                    .AddTransient<PlanEditorPage>()
+                    .AddTransient<ExercisesPage>()
+                    .AddTransient<ExerciseDetailPage>();
             }
         }
     }

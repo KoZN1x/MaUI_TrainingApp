@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView
+    x:Class="MauiTrainApp.Controls.SectionHeader"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Name="Root">
+
+    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+        <Label
+            Style="{StaticResource SectionCaption}"
+            Text="{Binding Title, Source={x:Reference Root}}"
+            VerticalOptions="Center" />
+        <Button
+            Grid.Column="1"
+            Command="{Binding ActionCommand, Source={x:Reference Root}}"
+            IsVisible="{Binding HasAction, Source={x:Reference Root}}"
+            Style="{StaticResource GhostButton}"
+            Text="{Binding ActionText, Source={x:Reference Root}}" />
+    </Grid>
+
+</ContentView>

@@ -1,4 +1,4 @@
-﻿<?xml version = "1.0" encoding = "UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MauiTrainApp"
@@ -12,6 +12,12 @@
             </ResourceDictionary.MergedDictionaries>
 
             <converters:WorkingSetMarkConverter x:Key="WorkingSetMark" />
+            <converters:InvertedBoolConverter x:Key="InvertedBool" />
+            <converters:MuscleGroupConverter x:Key="MuscleGroupName" />
+            <converters:VolumeConverter x:Key="Volume" />
+            <converters:DurationConverter x:Key="Duration" />
+            <converters:WorkoutDayConverter x:Key="WorkoutDay" />
+            <converters:PercentConverter x:Key="Percent" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

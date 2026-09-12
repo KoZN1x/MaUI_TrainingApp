@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView
+    x:Class="MauiTrainApp.Controls.TagChip"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Name="Root">
+
+    <Border
+        x:Name="ChipBorder"
+        Padding="9,4"
+        HorizontalOptions="Start"
+        StrokeShape="RoundRectangle 999"
+        StrokeThickness="1">
+        <Label
+            x:Name="ChipLabel"
+            FontSize="11"
+            Text="{Binding Text, Source={x:Reference Root}}" />
+    </Border>
+
+</ContentView>

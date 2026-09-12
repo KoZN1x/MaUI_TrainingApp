@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView
+    x:Class="MauiTrainApp.Controls.StatTile"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Name="Root">
+
+    <Border Style="{StaticResource Tile}">
+        <VerticalStackLayout Spacing="{StaticResource Space1}">
+            <Label
+                Style="{StaticResource Numeric}"
+                Text="{Binding Value, Source={x:Reference Root}}" />
+            <Label
+                IsVisible="{Binding HasDelta, Source={x:Reference Root}}"
+                Style="{StaticResource Muted}"
+                Text="{Binding Delta, Source={x:Reference Root}}"
+                TextColor="{StaticResource Accent300}" />
+            <Label
+                Style="{StaticResource SectionCaption}"
+                Text="{Binding Caption, Source={x:Reference Root}}" />
+        </VerticalStackLayout>
+    </Border>
+
+</ContentView>

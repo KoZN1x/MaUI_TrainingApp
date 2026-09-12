@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="MauiTrainApp.Views.ProgressPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:MauiTrainApp.Controls"
+    Title="Прогресс">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="{StaticResource Space6}" Spacing="{StaticResource Space6}">
+
+            <controls:SectionHeader Title="Витрина примитивов" ActionText="Фаза 3" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space3}">
+                <controls:StatTile
+                    Caption="Объём за 30 дней"
+                    Delta="+12 %"
+                    Value="12,4 т" />
+                <controls:StatTile
+                    Grid.Column="1"
+                    Caption="Тренировок в неделю"
+                    Value="3,2" />
+            </Grid>
+
+            <HorizontalStackLayout Spacing="{StaticResource Space2}">
+                <controls:TagChip Kind="Accent" Text="Следующий" />
+                <controls:TagChip Kind="Outline" Text="Грудь" />
+                <controls:TagChip Kind="Neutral" Text="45 мин" />
+            </HorizontalStackLayout>
+
+            <controls:BarChartView x:Name="WeeklyVolume" ChartHeight="110" />
+
+            <Label
+                Style="{StaticResource Muted}"
+                Text="Экран собирается на фазе 3 плана" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

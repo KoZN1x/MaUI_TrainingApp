@@ -55,33 +55,29 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
                 .FirstOrDefault();
         }
 
+        public async Task<WorkoutListItemReadModel?> GetActiveAsync(
+            DateOnly day,
+            CancellationToken cancellationToken = default)
+        {
+            var candidates = await Project(Query.Where(x => x.WorkoutDay == day && x.DurationSeconds == null))
+                .Take(SameDayCandidates)
+                .ToListAsync(cancellationToken);
+
+            return candidates
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => x.ToReadModel())
+                .FirstOrDefault(x => x.TotalWorkingSetCount > 0 && !x.IsCompleted);
+        }
+
         protected override async Task<IReadOnlyCollection<WorkoutListItemReadModel>> ListAsync(
             IQueryable<WorkoutRecord> query,
             CancellationToken cancellationToken)
         {
-            var workouts = await query
-                .OrderByDescending(x => x.WorkoutDay)
-                .Select(x => new
-                {
-                    x.Id,
-                    x.WorkoutDay,
-                    x.TrainingPlanRecordId,
-                    x.DurationSeconds,
-                    TrainingPlanName = x.TrainingPlan!.Name,
-                    WorkingSets = x.ExerciseSets.Select(exerciseSet => exerciseSet.WorkingSets).ToList()
-                })
+            var workouts = await Project(query.OrderByDescending(x => x.WorkoutDay))
                 .ToListAsync(cancellationToken);
 
             return workouts
-                .Select(x => new WorkoutListItemReadModel(
-                    x.Id,
-                    x.WorkoutDay,
-                    x.TrainingPlanRecordId,
-                    x.TrainingPlanName,
-                    x.WorkingSets.CountCompletedWorkingSets(),
-                    x.WorkingSets.CountWorkingSets(),
-                    x.WorkingSets.SumCompletedVolume(),
-                    x.DurationSeconds is null ? null : TimeSpan.FromSeconds(x.DurationSeconds.Value)))
+                .Select(x => x.ToReadModel())
                 .ToList();
         }
 
@@ -116,6 +112,18 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
                     workout.TrainingPlanName,
                     workout.ExerciseSets.ToReadModels(),
                     workout.DurationSeconds is null ? null : TimeSpan.FromSeconds(workout.DurationSeconds.Value));
+        }
+
+        private static IQueryable<WorkoutListRow> Project(IQueryable<WorkoutRecord> query)
+        {
+            return query.Select(x => new WorkoutListRow(
+                x.Id,
+                x.WorkoutDay,
+                x.TrainingPlanRecordId,
+                x.TrainingPlan!.Name,
+                x.DurationSeconds,
+                x.CreatedAt,
+                x.ExerciseSets.Select(exerciseSet => exerciseSet.WorkingSets).ToList()));
         }
     }
 }

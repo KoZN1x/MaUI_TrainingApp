@@ -137,4 +137,50 @@ public class ReadRepositoryTests : IDisposable
         Assert.Null(details!.TrainingPlanId);
         Assert.Null(details.TrainingPlanName);
     }
+
+    [Fact]
+    public async Task ActiveWorkout_IsTodayWorkoutWithUnfinishedWorkingSets()
+    {
+        var squat = await _database.ExercisesWrite.AddAsync(TestData.NewExercise());
+        var workout = await _database.WorkoutsWrite.AddAsync(TestData.NewWorkout(TestData.NewExerciseSet(squat)));
+
+        var active = await _database.WorkoutReader.GetActiveAsync(TestData.WorkoutDay);
+
+        Assert.Equal(workout.Id, active!.Id);
+    }
+
+    [Fact]
+    public async Task ActiveWorkout_IgnoresFullyCompletedWorkout()
+    {
+        var squat = await _database.ExercisesWrite.AddAsync(TestData.NewExercise());
+        var workout = TestData.NewWorkout(TestData.NewExerciseSet(squat));
+
+        workout.ExerciseSets.Single().Complete();
+
+        await _database.WorkoutsWrite.AddAsync(workout);
+
+        Assert.Null(await _database.WorkoutReader.GetActiveAsync(TestData.WorkoutDay));
+    }
+
+    [Fact]
+    public async Task ActiveWorkout_IgnoresWorkoutWithRecordedDuration()
+    {
+        var squat = await _database.ExercisesWrite.AddAsync(TestData.NewExercise());
+        var workout = TestData.NewWorkout(TestData.NewExerciseSet(squat));
+
+        workout.SetDuration(TimeSpan.FromMinutes(45));
+
+        await _database.WorkoutsWrite.AddAsync(workout);
+
+        Assert.Null(await _database.WorkoutReader.GetActiveAsync(TestData.WorkoutDay));
+    }
+
+    [Fact]
+    public async Task ActiveWorkout_IgnoresOtherDays()
+    {
+        var squat = await _database.ExercisesWrite.AddAsync(TestData.NewExercise());
+        await _database.WorkoutsWrite.AddAsync(TestData.NewWorkout(TestData.NewExerciseSet(squat)));
+
+        Assert.Null(await _database.WorkoutReader.GetActiveAsync(TestData.WorkoutDay.AddDays(1)));
+    }
 }
