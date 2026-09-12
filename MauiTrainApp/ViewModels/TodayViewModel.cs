@@ -94,13 +94,13 @@ namespace MauiTrainApp.ViewModels
                 TodayText = $"{WorkoutDayConverter.ToText(today)}, {WorkoutDayConverter.ToWeekday(today)}";
 
                 var active = await QueryAsync(new GetActiveWorkoutQuery(today), token);
-                var next = await QueryAsync(new GetNextTrainingPlanQuery(), token);
+                var next = await QueryAsync(new GetNextTrainingPlanQuery(today), token);
                 var history = await QueryAsync(
                     new GetWorkoutsQuery(today.AddDays(-(HistoryDays - 1)), today), token);
                 var summary = await QueryAsync(
                     new GetProgressSummaryQuery(today.AddDays(-(SummaryDays - 1)), today), token);
 
-                ApplyHero(active.Workout, next.TrainingPlan);
+                ApplyHero(active.Workout, next.TrainingPlan, next.DaysUntil, today);
                 ApplyWeek(today, history.Workouts);
                 ApplySummary(summary.Summary, history.Workouts, today);
                 ApplyRecentWorkouts(history.Workouts);
@@ -152,7 +152,11 @@ namespace MauiTrainApp.ViewModels
             return _navigator.GoToHistoryAsync();
         }
 
-        private void ApplyHero(WorkoutListItemReadModel? active, TrainingPlanListItemReadModel? next)
+        private void ApplyHero(
+            WorkoutListItemReadModel? active,
+            TrainingPlanListItemReadModel? next,
+            int? daysUntil,
+            DateOnly today)
         {
             _activeWorkoutId = active?.Id;
             _nextTrainingPlanId = next?.Id;
@@ -169,7 +173,14 @@ namespace MauiTrainApp.ViewModels
 
             if (next is not null)
             {
-                HeroKicker = "План на сегодня";
+                HeroKicker = daysUntil switch
+                {
+                    0 => "План на сегодня",
+                    1 => "Завтра по плану",
+                    null => "Следующий по очереди",
+                    _ => $"Ближайшая тренировка {WeekDays.ToAccusative(today.AddDays(daysUntil.Value).DayOfWeek)}"
+                };
+
                 HeroTitle = next.Name;
                 HeroSubtitle = RussianPlural.Exercises(next.ExerciseSetCount);
                 HeroActionText = "Начать тренировку";

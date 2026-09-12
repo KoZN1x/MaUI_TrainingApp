@@ -2,4 +2,4 @@ using MauiTrainApp.Domain.ReadModels;
 
 namespace MauiTrainApp.Application.CQRS.Queries.GetNextTrainingPlan;
 
-public sealed record GetNextTrainingPlanResult(TrainingPlanListItemReadModel? TrainingPlan);
+public sealed record GetNextTrainingPlanResult(TrainingPlanListItemReadModel? TrainingPlan, int? DaysUntil);

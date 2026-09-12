@@ -9,4 +9,5 @@ public sealed record PlannedExerciseSet(Guid ExerciseId, IReadOnlyCollection<Pla
 
 public sealed record CreateTrainingPlanCommand(
     string Name,
-    IReadOnlyCollection<PlannedExerciseSet> ExerciseSets) : ICommand<CreateTrainingPlanResult>;
+    IReadOnlyCollection<PlannedExerciseSet> ExerciseSets,
+    IReadOnlyCollection<DayOfWeek>? ScheduledDays = null) : ICommand<CreateTrainingPlanResult>;

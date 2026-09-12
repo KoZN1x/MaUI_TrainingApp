@@ -1,4 +1,5 @@
 using MauiTrainApp.Domain.Entities;
+using MauiTrainApp.Domain.ValueObjects;
 using MauiTrainApp.Infrastructure.Interfaces;
 using MauiTrainApp.Infrastructure.Records;
 
@@ -21,7 +22,8 @@ namespace MauiTrainApp.Infrastructure.Mappers
                 record.ExerciseSets
                     .OrderBy(x => x.CreatedAt)
                     .ThenBy(x => x.Id)
-                    .Select(_exerciseSetRecordMapper.ToDomain))
+                    .Select(_exerciseSetRecordMapper.ToDomain),
+                WeekSchedule.FromMask(record.ScheduleMask))
             {
                 Id = record.Id,
                 CreatedAt = record.CreatedAt
@@ -45,6 +47,7 @@ namespace MauiTrainApp.Infrastructure.Mappers
                 CreatedAt = entity.CreatedAt,
                 UpdatedAt = entity.UpdatedAt,
                 Name = entity.Name,
+                ScheduleMask = entity.Schedule.Mask,
                 ExerciseSets = entity.ExerciseSets
                     .Select(x => _exerciseSetRecordMapper.ToRecord(x, parent))
                     .ToList()

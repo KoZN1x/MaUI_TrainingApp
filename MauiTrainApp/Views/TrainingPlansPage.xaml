@@ -64,6 +64,11 @@
                                             <VerticalStackLayout Spacing="{StaticResource Space1}">
                                                 <Label Style="{StaticResource CardTitle}" Text="{Binding Name}" />
                                                 <Label Style="{StaticResource Muted}" Text="{Binding SummaryText}" />
+                                                <Label
+                                                    IsVisible="{Binding HasSchedule}"
+                                                    Style="{StaticResource Muted}"
+                                                    Text="{Binding ScheduleText}"
+                                                    TextColor="{StaticResource Accent400}" />
                                             </VerticalStackLayout>
                                             <controls:TagChip
                                                 Grid.Column="1"

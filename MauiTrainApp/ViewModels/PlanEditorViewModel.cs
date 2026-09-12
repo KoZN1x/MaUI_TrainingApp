@@ -6,9 +6,11 @@ using MauiTrainApp.Application.CQRS.Commands.CreateTrainingPlan;
 using MauiTrainApp.Application.CQRS.Commands.DeleteTrainingPlan;
 using MauiTrainApp.Application.CQRS.Commands.RemovePlannedExerciseSet;
 using MauiTrainApp.Application.CQRS.Commands.RenameTrainingPlan;
+using MauiTrainApp.Application.CQRS.Commands.SetTrainingPlanSchedule;
 using MauiTrainApp.Application.CQRS.Commands.UpdatePlannedExerciseSet;
 using MauiTrainApp.Application.CQRS.Queries.GetExercises;
 using MauiTrainApp.Application.CQRS.Queries.GetTrainingPlanDetails;
+using MauiTrainApp.Domain.ValueObjects;
 using MauiTrainApp.Formatting;
 using MauiTrainApp.ExceptionHandler.Interfaces;
 using MauiTrainApp.Navigation;
@@ -30,6 +32,7 @@ namespace MauiTrainApp.ViewModels
         private const byte MaximumReps = 100;
         private const int MinimumSets = 1;
         private const int MaximumSets = 20;
+        private const double MaximumWeight = 1000;
 
         private readonly INavigator _navigator;
         private readonly IDialogService _dialogs;
@@ -44,6 +47,9 @@ namespace MauiTrainApp.ViewModels
 
         [ObservableProperty]
         private string _summaryText = string.Empty;
+
+        [ObservableProperty]
+        private string _scheduleText = string.Empty;
 
         [ObservableProperty]
         private string _saveText = "Создать план";
@@ -71,6 +77,8 @@ namespace MauiTrainApp.ViewModels
         }
 
         public ObservableCollection<PlannedExerciseViewModel> Exercises { get; } = [];
+
+        public ObservableCollection<ScheduleDayViewModel> Schedule { get; } = [];
 
         public ObservableCollection<ExerciseRowViewModel> PickerExercises { get; } = [];
 
@@ -101,6 +109,8 @@ namespace MauiTrainApp.ViewModels
 
                 Exercises.Clear();
 
+                var schedule = WeekSchedule.Empty;
+
                 if (_trainingPlanId is { } trainingPlanId)
                 {
                     var details = (await QueryAsync(new GetTrainingPlanDetailsQuery(trainingPlanId), token))
@@ -110,6 +120,7 @@ namespace MauiTrainApp.ViewModels
                     {
                         Name = details.Name;
                         _savedName = details.Name;
+                        schedule = details.Schedule;
 
                         foreach (var exerciseSet in details.ExerciseSets)
                         {
@@ -117,6 +128,8 @@ namespace MauiTrainApp.ViewModels
                         }
                     }
                 }
+
+                ApplySchedule(schedule);
 
                 Refresh();
             }, cancellationToken);
@@ -225,10 +238,63 @@ namespace MauiTrainApp.ViewModels
             ChangeAsync(exercise, setsDelta: 0, repsDelta: 0, -_settings.WeightStep, cancellationToken);
 
         [RelayCommand]
+        private Task ToggleScheduleDayAsync(ScheduleDayViewModel day, CancellationToken cancellationToken)
+        {
+            return RunAsync(async token =>
+            {
+                IReadOnlyCollection<DayOfWeek> days =
+                    [.. Schedule.Where(x => x.IsSelected ^ ReferenceEquals(x, day)).Select(x => x.Day)];
+
+                if (_trainingPlanId is { } trainingPlanId)
+                {
+                    await SendAsync(new SetTrainingPlanScheduleCommand(trainingPlanId, days), token);
+                }
+
+                day.IsSelected = !day.IsSelected;
+
+                RefreshScheduleText();
+            }, cancellationToken);
+        }
+
+        [RelayCommand]
+        private async Task EditPlannedExerciseAsync(
+            PlannedExerciseViewModel exercise,
+            CancellationToken cancellationToken)
+        {
+            var (sets, reps, weight) = Pending(exercise);
+
+            if (sets == exercise.Sets
+                && reps == exercise.Reps
+                && Math.Abs(weight - exercise.Weight) < double.Epsilon)
+            {
+                exercise.SyncInputs();
+
+                return;
+            }
+
+            await RunAsync(async token =>
+            {
+                if (await PersistAsync(exercise, sets, reps, weight, token))
+                {
+                    Refresh();
+                }
+            }, cancellationToken);
+
+            exercise.SyncInputs();
+        }
+
+        [RelayCommand]
         private Task SaveAsync(CancellationToken cancellationToken)
         {
             return RunAsync(async token =>
             {
+                foreach (var exercise in Exercises.ToList())
+                {
+                    var (sets, reps, weight) = Pending(exercise);
+
+                    await PersistAsync(exercise, sets, reps, weight, token);
+                }
+
                 if (_trainingPlanId is { } trainingPlanId)
                 {
                     if (Name.Trim() != _savedName)
@@ -240,7 +306,12 @@ namespace MauiTrainApp.ViewModels
                 }
                 else
                 {
-                    await SendAsync(new CreateTrainingPlanCommand(Name.Trim(), [.. Exercises.Select(ToPlanned)]), token);
+                    await SendAsync(
+                        new CreateTrainingPlanCommand(
+                            Name.Trim(),
+                            [.. Exercises.Select(ToPlanned)],
+                            SelectedDays()),
+                        token);
                 }
 
                 await _navigator.GoToTrainingPlansAsync();
@@ -282,31 +353,78 @@ namespace MauiTrainApp.ViewModels
         {
             return RunAsync(async token =>
             {
-                var sets = Math.Clamp(exercise.Sets + setsDelta, MinimumSets, MaximumSets);
-                var reps = (byte)Math.Clamp(exercise.Reps + repsDelta, MinimumReps, MaximumReps);
-                var weight = Math.Max(0, exercise.Weight + weightDelta);
+                var (pendingSets, pendingReps, pendingWeight) = Pending(exercise);
 
-                if (sets == exercise.Sets
-                    && reps == exercise.Reps
-                    && Math.Abs(weight - exercise.Weight) < double.Epsilon)
+                var sets = Math.Clamp(pendingSets + setsDelta, MinimumSets, MaximumSets);
+                var reps = (byte)Math.Clamp(pendingReps + repsDelta, MinimumReps, MaximumReps);
+                var weight = Math.Round(Math.Clamp(pendingWeight + weightDelta, 0, MaximumWeight), 2);
+
+                if (await PersistAsync(exercise, sets, reps, weight, token))
                 {
-                    return;
+                    Refresh();
                 }
-
-                if (_trainingPlanId is { } trainingPlanId && exercise.ExerciseSetId is { } exerciseSetId)
+                else
                 {
-                    await SendAsync(
-                        new UpdatePlannedExerciseSetCommand(trainingPlanId, exerciseSetId, sets, reps, weight),
-                        token);
+                    exercise.SyncInputs();
                 }
-
-                exercise.Sets = sets;
-                exercise.Reps = reps;
-                exercise.Weight = weight;
-
-                Refresh();
             }, cancellationToken);
         }
+
+        private (int Sets, byte Reps, double Weight) Pending(PlannedExerciseViewModel exercise)
+        {
+            return (
+                NumberInput.Sets(exercise.SetsText, exercise.Sets, MinimumSets, MaximumSets),
+                NumberInput.Reps(exercise.RepsText, exercise.Reps, MinimumReps, MaximumReps),
+                NumberInput.Weight(exercise.WeightText, exercise.Weight, MaximumWeight));
+        }
+
+        private async Task<bool> PersistAsync(
+            PlannedExerciseViewModel exercise,
+            int sets,
+            byte reps,
+            double weight,
+            CancellationToken cancellationToken)
+        {
+            if (sets == exercise.Sets
+                && reps == exercise.Reps
+                && Math.Abs(weight - exercise.Weight) < double.Epsilon)
+            {
+                return false;
+            }
+
+            if (_trainingPlanId is { } trainingPlanId && exercise.ExerciseSetId is { } exerciseSetId)
+            {
+                await SendAsync(
+                    new UpdatePlannedExerciseSetCommand(trainingPlanId, exerciseSetId, sets, reps, weight),
+                    cancellationToken);
+            }
+
+            exercise.Apply(sets, reps, weight);
+
+            return true;
+        }
+
+        private void ApplySchedule(WeekSchedule schedule)
+        {
+            Schedule.Clear();
+
+            foreach (var day in WeekDays.Ordered)
+            {
+                Schedule.Add(new ScheduleDayViewModel(day, schedule.Contains(day)));
+            }
+
+            RefreshScheduleText();
+        }
+
+        private void RefreshScheduleText()
+        {
+            ScheduleText = Schedule.Any(x => x.IsSelected)
+                ? WeekDays.Describe(WeekSchedule.From(SelectedDays()))
+                : "Без расписания — план предлагается по очереди";
+        }
+
+        private IReadOnlyCollection<DayOfWeek> SelectedDays() =>
+            [.. Schedule.Where(x => x.IsSelected).Select(x => x.Day)];
 
         private void Refresh()
         {

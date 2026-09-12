@@ -27,6 +27,24 @@
                     <Label Style="{StaticResource Muted}" Text="{Binding SummaryText}" />
                 </VerticalStackLayout>
 
+                <VerticalStackLayout Spacing="{StaticResource Space3}">
+                    <Label Style="{StaticResource SectionCaption}" Text="Дни недели" />
+                    <HorizontalStackLayout
+                        BindableLayout.ItemsSource="{Binding Schedule}"
+                        Spacing="{StaticResource Space2}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="items:ScheduleDayViewModel">
+                                <controls:TagChip
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PlanEditorViewModel}}, Path=ToggleScheduleDayCommand}"
+                                    CommandParameter="{Binding .}"
+                                    Kind="{Binding ChipKind}"
+                                    Text="{Binding Label}" />
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
+                    <Label Style="{StaticResource Muted}" Text="{Binding ScheduleText}" />
+                </VerticalStackLayout>
+
                 <controls:SectionHeader
                     ActionCommand="{Binding StartPickingCommand}"
                     ActionText="+ Добавить"
@@ -53,7 +71,7 @@
                                             Text="Убрать" />
                                     </Grid>
 
-                                    <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*" ColumnSpacing="{StaticResource Space2}">
+                                    <Grid ColumnDefinitions="Auto,Auto,72,Auto,*" ColumnSpacing="{StaticResource Space2}">
                                         <Label
                                             Grid.Column="0"
                                             Style="{StaticResource Muted}"
@@ -66,12 +84,12 @@
                                             CommandParameter="{Binding .}"
                                             Style="{StaticResource StepButton}"
                                             Text="−" />
-                                        <Label
+                                        <Entry
                                             Grid.Column="2"
-                                            HorizontalTextAlignment="Center"
-                                            Text="{Binding SetsText}"
-                                            VerticalOptions="Center"
-                                            WidthRequest="34" />
+                                            Completed="OnPlannedEntryCompleted"
+                                            Style="{StaticResource NumberEntry}"
+                                            Text="{Binding SetsText, Mode=TwoWay}"
+                                            Unfocused="OnPlannedEntryUnfocused" />
                                         <Button
                                             Grid.Column="3"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PlanEditorViewModel}}, Path=IncreaseSetsCommand}"
@@ -80,7 +98,7 @@
                                             Text="+" />
                                     </Grid>
 
-                                    <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*" ColumnSpacing="{StaticResource Space2}">
+                                    <Grid ColumnDefinitions="Auto,Auto,72,Auto,*" ColumnSpacing="{StaticResource Space2}">
                                         <Label
                                             Grid.Column="0"
                                             Style="{StaticResource Muted}"
@@ -93,12 +111,12 @@
                                             CommandParameter="{Binding .}"
                                             Style="{StaticResource StepButton}"
                                             Text="−" />
-                                        <Label
+                                        <Entry
                                             Grid.Column="2"
-                                            HorizontalTextAlignment="Center"
-                                            Text="{Binding RepsText}"
-                                            VerticalOptions="Center"
-                                            WidthRequest="34" />
+                                            Completed="OnPlannedEntryCompleted"
+                                            Style="{StaticResource NumberEntry}"
+                                            Text="{Binding RepsText, Mode=TwoWay}"
+                                            Unfocused="OnPlannedEntryUnfocused" />
                                         <Button
                                             Grid.Column="3"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PlanEditorViewModel}}, Path=IncreaseRepsCommand}"
@@ -107,7 +125,7 @@
                                             Text="+" />
                                     </Grid>
 
-                                    <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*" ColumnSpacing="{StaticResource Space2}">
+                                    <Grid ColumnDefinitions="Auto,Auto,72,Auto,*" ColumnSpacing="{StaticResource Space2}">
                                         <Label
                                             Grid.Column="0"
                                             Style="{StaticResource Muted}"
@@ -120,12 +138,12 @@
                                             CommandParameter="{Binding .}"
                                             Style="{StaticResource StepButton}"
                                             Text="−" />
-                                        <Label
+                                        <Entry
                                             Grid.Column="2"
-                                            HorizontalTextAlignment="Center"
-                                            Text="{Binding WeightText}"
-                                            VerticalOptions="Center"
-                                            WidthRequest="34" />
+                                            Completed="OnPlannedEntryCompleted"
+                                            Style="{StaticResource NumberEntry}"
+                                            Text="{Binding WeightText, Mode=TwoWay}"
+                                            Unfocused="OnPlannedEntryUnfocused" />
                                         <Button
                                             Grid.Column="3"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PlanEditorViewModel}}, Path=IncreaseWeightCommand}"

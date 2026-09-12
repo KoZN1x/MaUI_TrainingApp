@@ -10,6 +10,7 @@ using MauiTrainApp.Application.CQRS.Commands.DeleteTrainingPlan;
 using MauiTrainApp.Application.CQRS.Commands.DeleteWorkout;
 using MauiTrainApp.Application.CQRS.Commands.RemovePlannedExerciseSet;
 using MauiTrainApp.Application.CQRS.Commands.RenameTrainingPlan;
+using MauiTrainApp.Application.CQRS.Commands.SetTrainingPlanSchedule;
 using MauiTrainApp.Application.CQRS.Commands.ResetWorkingSet;
 using MauiTrainApp.Application.CQRS.Commands.StartWorkoutFromPlan;
 using MauiTrainApp.Application.CQRS.Commands.UpdatePerformedWorkingSet;
@@ -61,6 +62,7 @@ namespace MauiTrainApp.Application.DI
                     .AddCommand<UpdateExerciseCommand, UpdateExerciseResult, UpdateExerciseCommandHandler>()
                     .AddCommand<CompleteWorkoutCommand, CompleteWorkoutResult, CompleteWorkoutCommandHandler>()
                     .AddCommand<RenameTrainingPlanCommand, RenameTrainingPlanResult, RenameTrainingPlanCommandHandler>()
+                    .AddCommand<SetTrainingPlanScheduleCommand, SetTrainingPlanScheduleResult, SetTrainingPlanScheduleCommandHandler>()
                     .AddCommand<AddPlannedExerciseSetCommand, AddPlannedExerciseSetResult, AddPlannedExerciseSetCommandHandler>()
                     .AddCommand<RemovePlannedExerciseSetCommand, RemovePlannedExerciseSetResult, RemovePlannedExerciseSetCommandHandler>()
                     .AddCommand<AddPerformedWorkingSetCommand, AddPerformedWorkingSetResult, AddPerformedWorkingSetCommandHandler>();

@@ -10,6 +10,7 @@ using MauiTrainApp.Application.CQRS.Commands.ResetWorkingSet;
 using MauiTrainApp.Application.CQRS.Commands.UpdatePerformedWorkingSet;
 using MauiTrainApp.Application.CQRS.Queries.GetWorkoutDetails;
 using MauiTrainApp.Converters;
+using MauiTrainApp.Formatting;
 using MauiTrainApp.ExceptionHandler.Interfaces;
 using MauiTrainApp.Navigation;
 using MauiTrainApp.Navigation.Interfaces;
@@ -26,6 +27,7 @@ namespace MauiTrainApp.ViewModels
     {
         private const byte MinimumReps = 1;
         private const byte MaximumReps = 100;
+        private const double MaximumWeight = 1000;
 
         private readonly INavigator _navigator;
         private readonly IDialogService _dialogs;
@@ -166,6 +168,29 @@ namespace MauiTrainApp.ViewModels
             ChangeAsync(workingSet, weightDelta: 0, repsDelta: -1, cancellationToken);
 
         [RelayCommand]
+        private async Task EditWorkingSetAsync(WorkingSetViewModel workingSet, CancellationToken cancellationToken)
+        {
+            var (reps, weight) = Pending(workingSet);
+
+            if (reps == workingSet.Reps && Math.Abs(weight - workingSet.Weight) < double.Epsilon)
+            {
+                workingSet.SyncInputs();
+
+                return;
+            }
+
+            await RunAsync(async token =>
+            {
+                if (await PersistAsync(workingSet, reps, weight, token))
+                {
+                    Refresh();
+                }
+            }, cancellationToken);
+
+            workingSet.SyncInputs();
+        }
+
+        [RelayCommand]
         private Task ToggleWorkingSetAsync(WorkingSetViewModel workingSet, CancellationToken cancellationToken)
         {
             return RunAsync(async token =>
@@ -180,19 +205,22 @@ namespace MauiTrainApp.ViewModels
                 }
                 else
                 {
+                    var (reps, weight) = Pending(workingSet);
+
                     await SendAsync(
                         new UpdatePerformedWorkingSetCommand(
                             _workoutId,
                             workingSet.ExerciseSetId,
                             workingSet.Index,
-                            workingSet.Reps,
-                            workingSet.Weight),
+                            reps,
+                            weight),
                         token);
 
                     await SendAsync(
                         new CompleteWorkingSetCommand(_workoutId, workingSet.ExerciseSetId, workingSet.Index),
                         token);
 
+                    workingSet.Apply(reps, weight);
                     workingSet.IsCompleted = true;
                 }
 
@@ -239,6 +267,13 @@ namespace MauiTrainApp.ViewModels
         {
             return RunAsync(async token =>
             {
+                foreach (var workingSet in Exercises.SelectMany(x => x.WorkingSets).ToList())
+                {
+                    var (reps, weight) = Pending(workingSet);
+
+                    await PersistAsync(workingSet, reps, weight, token);
+                }
+
                 _clock.Stop();
 
                 await SendAsync(new CompleteWorkoutCommand(_workoutId, DateTimeOffset.UtcNow), token);
@@ -278,28 +313,52 @@ namespace MauiTrainApp.ViewModels
         {
             return RunAsync(async token =>
             {
-                var weight = Math.Max(0, workingSet.Weight + weightDelta);
-                var reps = (byte)Math.Clamp(workingSet.Reps + repsDelta, MinimumReps, MaximumReps);
+                var (pendingReps, pendingWeight) = Pending(workingSet);
 
-                if (Math.Abs(weight - workingSet.Weight) < double.Epsilon && reps == workingSet.Reps)
+                var weight = Math.Round(Math.Clamp(pendingWeight + weightDelta, 0, MaximumWeight), 2);
+                var reps = (byte)Math.Clamp(pendingReps + repsDelta, MinimumReps, MaximumReps);
+
+                if (await PersistAsync(workingSet, reps, weight, token))
                 {
-                    return;
+                    Refresh();
                 }
-
-                await SendAsync(
-                    new UpdatePerformedWorkingSetCommand(
-                        _workoutId,
-                        workingSet.ExerciseSetId,
-                        workingSet.Index,
-                        reps,
-                        weight),
-                    token);
-
-                workingSet.Weight = weight;
-                workingSet.Reps = reps;
-
-                Refresh();
+                else
+                {
+                    workingSet.SyncInputs();
+                }
             }, cancellationToken);
+        }
+
+        private (byte Reps, double Weight) Pending(WorkingSetViewModel workingSet)
+        {
+            return (
+                NumberInput.Reps(workingSet.RepsText, workingSet.Reps, MinimumReps, MaximumReps),
+                NumberInput.Weight(workingSet.WeightText, workingSet.Weight, MaximumWeight));
+        }
+
+        private async Task<bool> PersistAsync(
+            WorkingSetViewModel workingSet,
+            byte reps,
+            double weight,
+            CancellationToken cancellationToken)
+        {
+            if (reps == workingSet.Reps && Math.Abs(weight - workingSet.Weight) < double.Epsilon)
+            {
+                return false;
+            }
+
+            await SendAsync(
+                new UpdatePerformedWorkingSetCommand(
+                    _workoutId,
+                    workingSet.ExerciseSetId,
+                    workingSet.Index,
+                    reps,
+                    weight),
+                cancellationToken);
+
+            workingSet.Apply(reps, weight);
+
+            return true;
         }
 
         private void Refresh()

@@ -48,7 +48,7 @@ namespace MauiTrainApp.ViewModels
                 await _startup.EnsureReadyAsync();
 
                 var plans = await QueryAsync(new GetTrainingPlansQuery(), token);
-                var next = await QueryAsync(new GetNextTrainingPlanQuery(), token);
+                var next = await QueryAsync(new GetNextTrainingPlanQuery(DateOnly.FromDateTime(DateTime.Now)), token);
 
                 TrainingPlans.Clear();
 

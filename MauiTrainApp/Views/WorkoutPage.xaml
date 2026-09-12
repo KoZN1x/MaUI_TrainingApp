@@ -82,64 +82,82 @@
                                         Text="Отметить всё" />
                                 </Grid>
 
+                                <Grid
+                                    ColumnDefinitions="Auto,Auto,*,Auto,Auto,*,Auto,Auto"
+                                    ColumnSpacing="4"
+                                    IsVisible="{Binding IsExpanded}">
+                                    <Label
+                                        Grid.Column="2"
+                                        FontSize="10"
+                                        HorizontalTextAlignment="Center"
+                                        Text="кг"
+                                        TextColor="{StaticResource Neutral500}" />
+                                    <Label
+                                        Grid.Column="5"
+                                        FontSize="10"
+                                        HorizontalTextAlignment="Center"
+                                        Text="повт"
+                                        TextColor="{StaticResource Neutral500}" />
+                                </Grid>
+
                                 <VerticalStackLayout
                                     BindableLayout.ItemsSource="{Binding WorkingSets}"
                                     IsVisible="{Binding IsExpanded}"
                                     Spacing="{StaticResource Space3}">
                                     <BindableLayout.ItemTemplate>
                                         <DataTemplate x:DataType="items:WorkingSetViewModel">
-                                            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto" ColumnSpacing="{StaticResource Space2}">
+                                            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,*,Auto,Auto" ColumnSpacing="4">
 
                                                 <Label
                                                     Grid.Column="0"
                                                     Style="{StaticResource Muted}"
                                                     Text="{Binding Number, StringFormat='#{0}'}"
                                                     VerticalOptions="Center"
-                                                    WidthRequest="24" />
+                                                    WidthRequest="20" />
 
                                                 <Button
                                                     Grid.Column="1"
                                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=DecreaseWeightCommand}"
                                                     CommandParameter="{Binding .}"
-                                                    Style="{StaticResource StepButton}"
+                                                    Style="{StaticResource StepButtonSmall}"
                                                     Text="−" />
-                                                <Label
+                                                <Entry
                                                     Grid.Column="2"
-                                                    HorizontalTextAlignment="Center"
-                                                    Text="{Binding WeightText}"
-                                                    VerticalOptions="Center"
-                                                    WidthRequest="40" />
+                                                    Completed="OnWorkingSetEntryCompleted"
+                                                    Style="{StaticResource NumberEntry}"
+                                                    Text="{Binding WeightText, Mode=TwoWay}"
+                                                    Unfocused="OnWorkingSetEntryUnfocused" />
                                                 <Button
                                                     Grid.Column="3"
                                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=IncreaseWeightCommand}"
                                                     CommandParameter="{Binding .}"
-                                                    Style="{StaticResource StepButton}"
+                                                    Style="{StaticResource StepButtonSmall}"
                                                     Text="+" />
 
                                                 <Button
                                                     Grid.Column="4"
                                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=DecreaseRepsCommand}"
                                                     CommandParameter="{Binding .}"
-                                                    Style="{StaticResource StepButton}"
+                                                    Style="{StaticResource StepButtonSmall}"
                                                     Text="−" />
-                                                <Label
+                                                <Entry
                                                     Grid.Column="5"
-                                                    HorizontalTextAlignment="Center"
-                                                    Text="{Binding RepsText}"
-                                                    VerticalOptions="Center"
-                                                    WidthRequest="30" />
+                                                    Completed="OnWorkingSetEntryCompleted"
+                                                    Style="{StaticResource NumberEntry}"
+                                                    Text="{Binding RepsText, Mode=TwoWay}"
+                                                    Unfocused="OnWorkingSetEntryUnfocused" />
                                                 <Button
                                                     Grid.Column="6"
                                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=IncreaseRepsCommand}"
                                                     CommandParameter="{Binding .}"
-                                                    Style="{StaticResource StepButton}"
+                                                    Style="{StaticResource StepButtonSmall}"
                                                     Text="+" />
 
                                                 <Button
-                                                    Grid.Column="8"
+                                                    Grid.Column="7"
                                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=ToggleWorkingSetCommand}"
                                                     CommandParameter="{Binding .}"
-                                                    Style="{StaticResource StepButton}"
+                                                    Style="{StaticResource StepButtonSmall}"
                                                     Text="{Binding IsCompleted, Converter={StaticResource WorkingSetMark}}" />
 
                                             </Grid>

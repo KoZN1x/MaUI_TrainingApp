@@ -1,5 +1,6 @@
 using MauiTrainApp.Domain.Interfaces;
 using MauiTrainApp.Domain.ReadModels;
+using MauiTrainApp.Domain.ValueObjects;
 using MauiTrainApp.Infrastructure.Database;
 using MauiTrainApp.Infrastructure.Records;
 using MauiTrainApp.Infrastructure.Repositories.Base;
@@ -20,10 +21,22 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
             IQueryable<TrainingPlanRecord> query,
             CancellationToken cancellationToken)
         {
-            return await query
+            var trainingPlans = await query
                 .OrderBy(x => x.Name)
-                .Select(x => new TrainingPlanListItemReadModel(x.Id, x.Name, x.ExerciseSets.Count))
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Name,
+                    x.ScheduleMask,
+                    ExerciseSetCount = x.ExerciseSets.Count
+                })
                 .ToListAsync(cancellationToken);
+
+            return [.. trainingPlans.Select(x => new TrainingPlanListItemReadModel(
+                x.Id,
+                x.Name,
+                x.ExerciseSetCount,
+                WeekSchedule.FromMask(x.ScheduleMask)))];
         }
 
         protected override async Task<TrainingPlanDetailsReadModel?> DetailsAsync(
@@ -35,6 +48,7 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
                 {
                     x.Id,
                     x.Name,
+                    x.ScheduleMask,
                     ExerciseSets = x.ExerciseSets
                         .Select(exerciseSet => new ExerciseSetRow(
                             exerciseSet.Id,
@@ -51,7 +65,8 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
                 : new TrainingPlanDetailsReadModel(
                     trainingPlan.Id,
                     trainingPlan.Name,
-                    trainingPlan.ExerciseSets.ToReadModels());
+                    trainingPlan.ExerciseSets.ToReadModels(),
+                    WeekSchedule.FromMask(trainingPlan.ScheduleMask));
         }
     }
 }

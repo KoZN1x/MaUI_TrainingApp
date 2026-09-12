@@ -54,7 +54,7 @@ public class SeededStartupTests : IAsyncLifetime
         var sender = Sender();
 
         var active = await sender.QueryAsync(new GetActiveWorkoutQuery(Today));
-        var next = await sender.QueryAsync(new GetNextTrainingPlanQuery());
+        var next = await sender.QueryAsync(new GetNextTrainingPlanQuery(Today));
         var history = await sender.QueryAsync(new GetWorkoutsQuery(Today.AddDays(-179), Today));
         var summary = await sender.QueryAsync(new GetProgressSummaryQuery(Today.AddDays(-29), Today));
 

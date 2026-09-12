@@ -7,11 +7,14 @@ namespace MauiTrainApp.ViewModels.Items
         Guid Id,
         string Name,
         string SummaryText,
+        string ScheduleText,
         IReadOnlyList<string> ExerciseNames,
         bool IsNext)
     {
         private const int MinutesPerWorkingSet = 3;
         private const int MinutesRounding = 5;
+
+        public bool HasSchedule => ScheduleText.Length > 0;
 
         public static TrainingPlanRowViewModel From(TrainingPlanDetailsReadModel trainingPlan, bool isNext)
         {
@@ -26,6 +29,7 @@ namespace MauiTrainApp.ViewModels.Items
                 trainingPlan.Id,
                 trainingPlan.Name,
                 summary,
+                trainingPlan.Schedule.IsEmpty ? string.Empty : WeekDays.Describe(trainingPlan.Schedule),
                 [.. trainingPlan.ExerciseSets.Select(x => x.ExerciseName)],
                 isNext);
         }

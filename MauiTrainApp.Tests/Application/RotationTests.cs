@@ -52,7 +52,7 @@ public class RotationTests : IAsyncLifetime
     [Fact]
     public async Task NextTrainingPlan_IsNullWithoutAnyPlans()
     {
-        var next = await Sender().QueryAsync(new GetNextTrainingPlanQuery());
+        var next = await Sender().QueryAsync(new GetNextTrainingPlanQuery(Day));
 
         Assert.Null(next.TrainingPlan);
     }
@@ -65,7 +65,7 @@ public class RotationTests : IAsyncLifetime
         await CreatePlanAsync(sender, "A day");
         await CreatePlanAsync(sender, "B day");
 
-        var next = await sender.QueryAsync(new GetNextTrainingPlanQuery());
+        var next = await sender.QueryAsync(new GetNextTrainingPlanQuery(Day));
 
         Assert.Equal("A day", next.TrainingPlan!.Name);
     }
@@ -80,7 +80,7 @@ public class RotationTests : IAsyncLifetime
 
         await sender.SendAsync(new StartWorkoutFromPlanCommand(first, Day));
 
-        var next = await sender.QueryAsync(new GetNextTrainingPlanQuery());
+        var next = await sender.QueryAsync(new GetNextTrainingPlanQuery(Day));
 
         Assert.Equal("B day", next.TrainingPlan!.Name);
     }
@@ -95,7 +95,7 @@ public class RotationTests : IAsyncLifetime
 
         await sender.SendAsync(new StartWorkoutFromPlanCommand(last, Day));
 
-        var next = await sender.QueryAsync(new GetNextTrainingPlanQuery());
+        var next = await sender.QueryAsync(new GetNextTrainingPlanQuery(Day));
 
         Assert.Equal("A day", next.TrainingPlan!.Name);
     }
@@ -111,7 +111,7 @@ public class RotationTests : IAsyncLifetime
         await sender.SendAsync(new StartWorkoutFromPlanCommand(removed, Day));
         await sender.SendAsync(new DeleteTrainingPlanCommand(removed));
 
-        var next = await sender.QueryAsync(new GetNextTrainingPlanQuery());
+        var next = await sender.QueryAsync(new GetNextTrainingPlanQuery(Day));
 
         Assert.Equal("A day", next.TrainingPlan!.Name);
     }

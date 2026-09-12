@@ -37,7 +37,10 @@ internal sealed class CreateTrainingPlanCommandHandler
             exerciseSets.Add(new ExerciseSet(exercise, plannedSet.WorkingSets.Select(ToWorkingSet)));
         }
 
-        var trainingPlan = new TrainingPlan(command.Name, exerciseSets);
+        var trainingPlan = new TrainingPlan(
+            command.Name,
+            exerciseSets,
+            command.ScheduledDays is null ? WeekSchedule.Empty : WeekSchedule.From(command.ScheduledDays));
 
         await _trainingPlans.AddAsync(trainingPlan, cancellationToken);
 

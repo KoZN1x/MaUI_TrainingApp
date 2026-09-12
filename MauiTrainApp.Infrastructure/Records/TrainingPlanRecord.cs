@@ -6,6 +6,8 @@ namespace MauiTrainApp.Infrastructure.Records
     {
         public required string Name { get; init; }
 
+        public int ScheduleMask { get; init; }
+
         public ICollection<ExerciseSetRecord> ExerciseSets { get; init; } = [];
     }
 }

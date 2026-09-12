@@ -6,15 +6,21 @@ namespace MauiTrainApp.Domain.Entities;
 
 public sealed class TrainingPlan : ExerciseSetAggregate
 {
-    public TrainingPlan(string name, IEnumerable<ExerciseSet>? exerciseSets = null)
+    public TrainingPlan(
+        string name,
+        IEnumerable<ExerciseSet>? exerciseSets = null,
+        WeekSchedule schedule = default)
         : base(exerciseSets)
     {
         Name = EnsureName(name);
+        Schedule = schedule;
     }
 
     #region Properties
 
     public string Name { get; private set; }
+
+    public WeekSchedule Schedule { get; private set; }
 
     #endregion
 
@@ -23,6 +29,13 @@ public sealed class TrainingPlan : ExerciseSetAggregate
     public void SetName(string name)
     {
         Name = EnsureName(name);
+
+        SetUpdatedTime();
+    }
+
+    public void SetSchedule(WeekSchedule schedule)
+    {
+        Schedule = schedule;
 
         SetUpdatedTime();
     }
