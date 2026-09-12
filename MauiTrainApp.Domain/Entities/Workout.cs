@@ -18,9 +18,6 @@ namespace MauiTrainApp.Domain.Entities
 
         public DateOnly WorkoutDay { get; private set; }
 
-        /// <summary>
-        /// План, по которому проводилась тренировка. Null, если тренировка велась без плана.
-        /// </summary>
         public Guid? TrainingPlanId { get; private set; }
 
         public bool IsCompleted => ExerciseSets.Count > 0 && ExerciseSets.All(x => x.IsCompleted);

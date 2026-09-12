@@ -15,7 +15,7 @@ namespace MauiTrainApp.Infrastructure.Database.Configurations
               .HasForeignKey(x => x.WorkoutRecordId)
               .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne<TrainingPlanRecord>()
+            builder.HasOne(x => x.TrainingPlan)
               .WithMany()
               .HasForeignKey(x => x.TrainingPlanRecordId)
               .OnDelete(DeleteBehavior.SetNull);

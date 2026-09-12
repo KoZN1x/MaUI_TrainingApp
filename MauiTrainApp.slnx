@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="MauiTrainApp.Application/MauiTrainApp.Application.csproj" />
+  <Project Path="MauiTrainApp.Core/MauiTrainApp.Core.csproj" />
   <Project Path="MauiTrainApp.Domain/MauiTrainApp.Domain.csproj" />
   <Project Path="MauiTrainApp.Infrastructure/MauiTrainApp.Infrastructure.csproj" />
   <Project Path="MauiTrainApp.Tests/MauiTrainApp.Tests.csproj" />

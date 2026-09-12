@@ -1,6 +1,9 @@
+using MauiTrainApp.Domain.Interfaces;
 using MauiTrainApp.Infrastructure.Database;
 using MauiTrainApp.Infrastructure.Mappers;
 using MauiTrainApp.Infrastructure.Repositories;
+using MauiTrainApp.Infrastructure.Repositories.Read;
+using MauiTrainApp.Infrastructure.Repositories.Write;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,18 +28,28 @@ internal sealed class TestDatabase : IDisposable
         var exerciseMapper = new ExerciseRecordMapper();
         var exerciseSetMapper = new ExerciseSetRecordMapper(exerciseMapper);
 
-        Exercises = new ExerciseRepository(exerciseMapper, Context);
-        Workouts = new WorkoutRepository(new WorkoutRecordMapper(exerciseSetMapper), Context);
-        TrainingPlans = new TrainingPlanRepository(new TrainingPlanRecordMapper(exerciseSetMapper), Context);
+        ExercisesWrite = new ExerciseWriteRepository(exerciseMapper, Context);
+        WorkoutsWrite = new WorkoutWriteRepository(new WorkoutRecordMapper(exerciseSetMapper), Context);
+        TrainingPlansWrite = new TrainingPlanWriteRepository(new TrainingPlanRecordMapper(exerciseSetMapper), Context);
+
+        ExerciseReader = new ExerciseReadRepository(Context);
+        WorkoutReader = new WorkoutReadRepository(Context);
+        TrainingPlanReader = new TrainingPlanReadRepository(Context);
     }
 
     public MauiTrainAppDbContext Context { get; }
 
-    public ExerciseRepository Exercises { get; }
+    public ExerciseWriteRepository ExercisesWrite { get; }
 
-    public WorkoutRepository Workouts { get; }
+    public WorkoutWriteRepository WorkoutsWrite { get; }
 
-    public TrainingPlanRepository TrainingPlans { get; }
+    public TrainingPlanWriteRepository TrainingPlansWrite { get; }
+
+    public IExerciseReadRepository ExerciseReader { get; }
+
+    public IWorkoutReadRepository WorkoutReader { get; }
+
+    public ITrainingPlanReadRepository TrainingPlanReader { get; }
 
     public void Dispose()
     {

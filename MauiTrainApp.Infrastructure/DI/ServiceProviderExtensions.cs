@@ -6,18 +6,16 @@ namespace MauiTrainApp.Infrastructure.DI
 {
     public static class ServiceProviderExtensions
     {
-        /// <summary>
-        /// Применяет миграции к файлу базы. Вызывать один раз при старте приложения.
-        /// </summary>
-        public static async Task MigrateDatabaseAsync(
-            this IServiceProvider serviceProvider,
-            CancellationToken cancellationToken = default)
+        extension(IServiceProvider serviceProvider)
         {
-            await using var scope = serviceProvider.CreateAsyncScope();
+            public async Task MigrateDatabaseAsync(CancellationToken cancellationToken = default)
+            {
+                await using var scope = serviceProvider.CreateAsyncScope();
 
-            var dbContext = scope.ServiceProvider.GetRequiredService<MauiTrainAppDbContext>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<MauiTrainAppDbContext>();
 
-            await dbContext.Database.MigrateAsync(cancellationToken);
+                await dbContext.Database.MigrateAsync(cancellationToken);
+            }
         }
     }
 }

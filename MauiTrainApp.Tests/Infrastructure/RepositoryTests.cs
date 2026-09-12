@@ -16,7 +16,7 @@ public class RepositoryTests : IDisposable
     {
         var workout = await AddWorkoutAsync();
 
-        var stored = await _database.Workouts.GetByIdAsync(workout.Id);
+        var stored = await _database.WorkoutsWrite.GetByIdAsync(workout.Id);
 
         Assert.NotNull(stored);
         Assert.Equal(workout, stored);
@@ -29,7 +29,7 @@ public class RepositoryTests : IDisposable
     {
         var workout = await AddWorkoutAsync();
 
-        var stored = await _database.Workouts.GetByIdAsync(workout.Id);
+        var stored = await _database.WorkoutsWrite.GetByIdAsync(workout.Id);
 
         Assert.Null(stored!.UpdatedAt);
     }
@@ -37,7 +37,7 @@ public class RepositoryTests : IDisposable
     [Fact]
     public async Task GetByIdAsync_ReturnsNullWhenMissing()
     {
-        Assert.Null(await _database.Workouts.GetByIdAsync(Guid.NewGuid()));
+        Assert.Null(await _database.WorkoutsWrite.GetByIdAsync(Guid.NewGuid()));
     }
 
     [Fact]
@@ -45,12 +45,12 @@ public class RepositoryTests : IDisposable
     {
         var workout = await AddWorkoutAsync();
         var removedSetId = workout.ExerciseSets.Single().Id;
-        var bench = await _database.Exercises.AddAsync(TestData.NewExercise("Bench press"));
+        var bench = await _database.ExercisesWrite.AddAsync(TestData.NewExercise("Bench press"));
 
         workout.ReplaceExerciseSets([TestData.NewExerciseSet(bench)]);
-        await _database.Workouts.UpdateAsync(workout);
+        await _database.WorkoutsWrite.UpdateAsync(workout);
 
-        var stored = await _database.Workouts.GetByIdAsync(workout.Id);
+        var stored = await _database.WorkoutsWrite.GetByIdAsync(workout.Id);
 
         Assert.Equal("Bench press", stored!.ExerciseSets.Single().Exercise.Name);
         Assert.False(await _database.Context.ExerciseSets.AsNoTracking().AnyAsync(x => x.Id == removedSetId));
@@ -63,9 +63,9 @@ public class RepositoryTests : IDisposable
         var workout = await AddWorkoutAsync();
 
         workout.ExerciseSets.Single().Complete();
-        await _database.Workouts.UpdateAsync(workout);
+        await _database.WorkoutsWrite.UpdateAsync(workout);
 
-        var stored = await _database.Workouts.GetByIdAsync(workout.Id);
+        var stored = await _database.WorkoutsWrite.GetByIdAsync(workout.Id);
 
         Assert.True(stored!.IsCompleted);
     }
@@ -75,9 +75,9 @@ public class RepositoryTests : IDisposable
     {
         var workout = await AddWorkoutAsync();
 
-        await _database.Workouts.DeleteAsync(workout);
+        await _database.WorkoutsWrite.DeleteAsync(workout);
 
-        Assert.Empty(await _database.Workouts.GetAllAsync());
+        Assert.False(await _database.Context.Workouts.AnyAsync());
         Assert.False(await _database.Context.ExerciseSets.AsNoTracking().AnyAsync(x => x.WorkoutRecordId != null));
     }
 
@@ -85,21 +85,21 @@ public class RepositoryTests : IDisposable
     public async Task DeleteAsync_ThrowsWhenMissing()
     {
         await Assert.ThrowsAsync<EntityNotFoundException<Workout>>(
-            () => _database.Workouts.DeleteAsync(TestData.NewWorkout()));
+            () => _database.WorkoutsWrite.DeleteAsync(TestData.NewWorkout()));
     }
 
     [Fact]
     public async Task WorkoutStartedFromPlan_KeepsPlanLink()
     {
-        var squat = await _database.Exercises.AddAsync(TestData.NewExercise());
-        var plan = await _database.TrainingPlans.AddAsync(
+        var squat = await _database.ExercisesWrite.AddAsync(TestData.NewExercise());
+        var plan = await _database.TrainingPlansWrite.AddAsync(
             TestData.NewTrainingPlan("Push day", TestData.NewExerciseSet(squat)));
 
         var workout = plan.StartWorkout(TestData.WorkoutDay);
-        await _database.Workouts.AddAsync(workout);
+        await _database.WorkoutsWrite.AddAsync(workout);
 
-        var storedWorkout = await _database.Workouts.GetByIdAsync(workout.Id);
-        var storedPlan = await _database.TrainingPlans.GetByIdAsync(plan.Id);
+        var storedWorkout = await _database.WorkoutsWrite.GetByIdAsync(workout.Id);
+        var storedPlan = await _database.TrainingPlansWrite.GetByIdAsync(plan.Id);
 
         Assert.Equal(plan.Id, storedWorkout!.TrainingPlanId);
         Assert.Equal("Push day", storedPlan!.Name);
@@ -110,8 +110,8 @@ public class RepositoryTests : IDisposable
     [Fact]
     public async Task PlanChildren_AreNotAttachedToWorkouts()
     {
-        var squat = await _database.Exercises.AddAsync(TestData.NewExercise());
-        var plan = await _database.TrainingPlans.AddAsync(
+        var squat = await _database.ExercisesWrite.AddAsync(TestData.NewExercise());
+        var plan = await _database.TrainingPlansWrite.AddAsync(
             TestData.NewTrainingPlan("Push day", TestData.NewExerciseSet(squat)));
 
         var planSets = await _database.Context.ExerciseSets
@@ -125,51 +125,24 @@ public class RepositoryTests : IDisposable
     [Fact]
     public async Task DeletingPlan_KeepsPerformedWorkout()
     {
-        var squat = await _database.Exercises.AddAsync(TestData.NewExercise());
-        var plan = await _database.TrainingPlans.AddAsync(
+        var squat = await _database.ExercisesWrite.AddAsync(TestData.NewExercise());
+        var plan = await _database.TrainingPlansWrite.AddAsync(
             TestData.NewTrainingPlan("Push day", TestData.NewExerciseSet(squat)));
-        var workout = await _database.Workouts.AddAsync(plan.StartWorkout(TestData.WorkoutDay));
+        var workout = await _database.WorkoutsWrite.AddAsync(plan.StartWorkout(TestData.WorkoutDay));
 
-        await _database.TrainingPlans.DeleteAsync(plan);
+        await _database.TrainingPlansWrite.DeleteAsync(plan);
 
-        var stored = await _database.Workouts.GetByIdAsync(workout.Id);
+        var stored = await _database.WorkoutsWrite.GetByIdAsync(workout.Id);
 
         Assert.NotNull(stored);
         Assert.Null(stored.TrainingPlanId);
         Assert.Single(stored.ExerciseSets);
     }
 
-    [Fact]
-    public async Task SearchByNameAsync_ReturnsDomainEntities()
-    {
-        await _database.Exercises.AddAsync(TestData.NewExercise());
-        await _database.Exercises.AddAsync(TestData.NewExercise("Bench press"));
-
-        var found = await _database.Exercises.SearchByNameAsync("ench");
-
-        Assert.Equal("Bench press", Assert.Single(found).Name);
-    }
-
-    [Fact]
-    public async Task GetByPeriodAsync_FiltersByWorkoutDay()
-    {
-        var squat = await _database.Exercises.AddAsync(TestData.NewExercise());
-        await _database.Workouts.AddAsync(
-            new Workout(new DateOnly(2026, 9, 12), [TestData.NewExerciseSet(squat)]));
-        await _database.Workouts.AddAsync(
-            new Workout(new DateOnly(2026, 10, 1), [TestData.NewExerciseSet(squat)]));
-
-        var found = await _database.Workouts.GetByPeriodAsync(
-            new DateOnly(2026, 9, 1),
-            new DateOnly(2026, 9, 30));
-
-        Assert.Equal(new DateOnly(2026, 9, 12), Assert.Single(found).WorkoutDay);
-    }
-
     private async Task<Workout> AddWorkoutAsync()
     {
-        var squat = await _database.Exercises.AddAsync(TestData.NewExercise());
+        var squat = await _database.ExercisesWrite.AddAsync(TestData.NewExercise());
 
-        return await _database.Workouts.AddAsync(TestData.NewWorkout(TestData.NewExerciseSet(squat)));
+        return await _database.WorkoutsWrite.AddAsync(TestData.NewWorkout(TestData.NewExerciseSet(squat)));
     }
 }

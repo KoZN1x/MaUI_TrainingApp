@@ -1,0 +1,96 @@
+using MauiTrainApp.Domain.Interfaces;
+using MauiTrainApp.Domain.ReadModels;
+using MauiTrainApp.Infrastructure.Database;
+using MauiTrainApp.Infrastructure.Records;
+using MauiTrainApp.Infrastructure.Repositories.Base;
+using Microsoft.EntityFrameworkCore;
+
+namespace MauiTrainApp.Infrastructure.Repositories.Read
+{
+    internal sealed class WorkoutReadRepository
+        : ReadRepositoryBase<WorkoutRecord, WorkoutListItemReadModel, WorkoutDetailsReadModel>,
+          IWorkoutReadRepository
+    {
+        public WorkoutReadRepository(MauiTrainAppDbContext dbContext)
+            : base(dbContext)
+        {
+        }
+
+        public Task<IReadOnlyCollection<WorkoutListItemReadModel>> GetByPeriodAsync(
+            DateOnly from,
+            DateOnly to,
+            CancellationToken cancellationToken = default)
+        {
+            return ListAsync(
+                Query.Where(x => x.WorkoutDay >= from && x.WorkoutDay <= to),
+                cancellationToken);
+        }
+
+        public Task<IReadOnlyCollection<WorkoutListItemReadModel>> GetByTrainingPlanAsync(
+            Guid trainingPlanId,
+            CancellationToken cancellationToken = default)
+        {
+            return ListAsync(
+                Query.Where(x => x.TrainingPlanRecordId == trainingPlanId),
+                cancellationToken);
+        }
+
+        protected override async Task<IReadOnlyCollection<WorkoutListItemReadModel>> ListAsync(
+            IQueryable<WorkoutRecord> query,
+            CancellationToken cancellationToken)
+        {
+            var workouts = await query
+                .OrderByDescending(x => x.WorkoutDay)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.WorkoutDay,
+                    x.TrainingPlanRecordId,
+                    TrainingPlanName = x.TrainingPlan!.Name,
+                    WorkingSets = x.ExerciseSets.Select(exerciseSet => exerciseSet.WorkingSets).ToList()
+                })
+                .ToListAsync(cancellationToken);
+
+            return workouts
+                .Select(x => new WorkoutListItemReadModel(
+                    x.Id,
+                    x.WorkoutDay,
+                    x.TrainingPlanRecordId,
+                    x.TrainingPlanName,
+                    x.WorkingSets.CountCompletedWorkingSets(),
+                    x.WorkingSets.CountWorkingSets()))
+                .ToList();
+        }
+
+        protected override async Task<WorkoutDetailsReadModel?> DetailsAsync(
+            IQueryable<WorkoutRecord> query,
+            CancellationToken cancellationToken)
+        {
+            var workout = await query
+                .Select(x => new
+                {
+                    x.Id,
+                    x.WorkoutDay,
+                    x.TrainingPlanRecordId,
+                    TrainingPlanName = x.TrainingPlan!.Name,
+                    ExerciseSets = x.ExerciseSets
+                        .Select(exerciseSet => new ExerciseSetRow(
+                            exerciseSet.Id,
+                            exerciseSet.ExerciseRecordId,
+                            exerciseSet.Exercise.Name,
+                            exerciseSet.WorkingSets))
+                        .ToList()
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            return workout is null
+                ? null
+                : new WorkoutDetailsReadModel(
+                    workout.Id,
+                    workout.WorkoutDay,
+                    workout.TrainingPlanRecordId,
+                    workout.TrainingPlanName,
+                    workout.ExerciseSets.ToReadModels());
+        }
+    }
+}
