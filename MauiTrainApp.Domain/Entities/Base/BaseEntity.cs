@@ -1,4 +1,4 @@
-﻿using MauiTrainApp.Domain.Interfaces;
+using MauiTrainApp.Domain.Interfaces;
 
 namespace MauiTrainApp.Domain.Entities.Base
 {
@@ -8,7 +8,7 @@ namespace MauiTrainApp.Domain.Entities.Base
 
         public Guid Id { get; init; } = Guid.NewGuid();
 
-        public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.Now;
+        public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.UtcNow;
 
         public DateTimeOffset? UpdatedAt { get; private set; }
 
@@ -18,15 +18,24 @@ namespace MauiTrainApp.Domain.Entities.Base
 
         public virtual void SetUpdatedTime(DateTimeOffset? updatedAt = null)
         {
-            if (updatedAt is null)
-            {
-                UpdatedAt = DateTimeOffset.Now;
-            }
-            else
-            {
-                UpdatedAt = updatedAt.Value;
-            }
+            UpdatedAt = updatedAt ?? DateTimeOffset.UtcNow;
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is BaseEntity other
+                && GetType() == other.GetType()
+                && Id == other.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(GetType(), Id);
+        }
+
+        public static bool operator ==(BaseEntity? left, BaseEntity? right) => Equals(left, right);
+
+        public static bool operator !=(BaseEntity? left, BaseEntity? right) => !Equals(left, right);
 
         #endregion
     }

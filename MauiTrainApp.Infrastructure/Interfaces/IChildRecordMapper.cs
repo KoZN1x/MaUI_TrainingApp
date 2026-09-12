@@ -2,7 +2,7 @@
 
 namespace MauiTrainApp.Infrastructure.Interfaces
 {
-    internal interface IChildRecordMapper<TEntity, TRecord, TParentKeyId>
+    internal interface IChildRecordMapper<TEntity, TRecord, in TParentKeyId>
         where TEntity : IEntity
         where TRecord : IDbRecord
     {

@@ -1,9 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+using MauiTrainApp.Infrastructure.DI;
+using Microsoft.Extensions.Logging;
 
 namespace MauiTrainApp
 {
     public static class MauiProgram
     {
+        private const string DatabaseFileName = "mauitrain.db";
+
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
@@ -15,11 +18,18 @@ namespace MauiTrainApp
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
+            builder.Services.AddInfrastructure(Path.Combine(FileSystem.AppDataDirectory, DatabaseFileName));
+
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif
 
-            return builder.Build();
+            var app = builder.Build();
+
+            // Через Task.Run, чтобы не ждать миграции на UI-контексте старта.
+            Task.Run(() => app.Services.MigrateDatabaseAsync()).GetAwaiter().GetResult();
+
+            return app;
         }
     }
 }

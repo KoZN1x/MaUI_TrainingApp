@@ -2,7 +2,7 @@
 
 namespace MauiTrainApp.Infrastructure.Records.Base
 {
-    internal abstract class BaseRecord : IDbRecord
+    internal abstract record BaseRecord : IDbRecord
     {
         public Guid Id { get; init; }
 

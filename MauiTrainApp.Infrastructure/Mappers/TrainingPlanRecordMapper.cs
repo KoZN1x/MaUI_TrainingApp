@@ -4,22 +4,21 @@ using MauiTrainApp.Infrastructure.Records;
 
 namespace MauiTrainApp.Infrastructure.Mappers
 {
-    internal class WorkoutRecordMapper : IRecordMapper<Workout, WorkoutRecord>
+    internal class TrainingPlanRecordMapper : IRecordMapper<TrainingPlan, TrainingPlanRecord>
     {
         private readonly IChildRecordMapper<ExerciseSet, ExerciseSetRecord, ExerciseSetParent> _exerciseSetRecordMapper;
 
-        public WorkoutRecordMapper(
+        public TrainingPlanRecordMapper(
             IChildRecordMapper<ExerciseSet, ExerciseSetRecord, ExerciseSetParent> exerciseSetRecordMapper)
         {
             _exerciseSetRecordMapper = exerciseSetRecordMapper;
         }
 
-        public Workout ToDomain(WorkoutRecord record)
+        public TrainingPlan ToDomain(TrainingPlanRecord record)
         {
-            var workout = new Workout(
-                record.WorkoutDay,
-                record.ExerciseSets.Select(_exerciseSetRecordMapper.ToDomain),
-                record.TrainingPlanRecordId)
+            var trainingPlan = new TrainingPlan(
+                record.Name,
+                record.ExerciseSets.Select(_exerciseSetRecordMapper.ToDomain))
             {
                 Id = record.Id,
                 CreatedAt = record.CreatedAt
@@ -27,23 +26,22 @@ namespace MauiTrainApp.Infrastructure.Mappers
 
             if (record.UpdatedAt is not null)
             {
-                workout.SetUpdatedTime(record.UpdatedAt);
+                trainingPlan.SetUpdatedTime(record.UpdatedAt);
             }
 
-            return workout;
+            return trainingPlan;
         }
 
-        public WorkoutRecord ToRecord(Workout entity)
+        public TrainingPlanRecord ToRecord(TrainingPlan entity)
         {
-            var parent = ExerciseSetParent.ForWorkout(entity.Id);
+            var parent = ExerciseSetParent.ForTrainingPlan(entity.Id);
 
-            return new WorkoutRecord
+            return new TrainingPlanRecord
             {
                 Id = entity.Id,
                 CreatedAt = entity.CreatedAt,
                 UpdatedAt = entity.UpdatedAt,
-                WorkoutDay = entity.WorkoutDay,
-                TrainingPlanRecordId = entity.TrainingPlanId,
+                Name = entity.Name,
                 ExerciseSets = entity.ExerciseSets
                     .Select(x => _exerciseSetRecordMapper.ToRecord(x, parent))
                     .ToList()

@@ -1,11 +1,12 @@
-﻿using MauiTrainApp.Domain.ValueObjects;
+using MauiTrainApp.Domain.ValueObjects;
 using MauiTrainApp.Infrastructure.Records.Base;
 
 namespace MauiTrainApp.Infrastructure.Records
 {
-    internal class ExerciseSetRecord : BaseRecord
+    internal record ExerciseSetRecord : BaseRecord
     {
-        public Guid WorkoutRecordId { get; init; }
+        public Guid? WorkoutRecordId { get; init; }
+        public Guid? TrainingPlanRecordId { get; init; }
         public Guid ExerciseRecordId { get; init; }
 
         public ExerciseRecord Exercise { get; init; } = null!;

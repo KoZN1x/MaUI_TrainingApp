@@ -1,4 +1,4 @@
-﻿using MauiTrainApp.Domain.Entities;
+using MauiTrainApp.Domain.Entities;
 using MauiTrainApp.Infrastructure.Interfaces;
 using MauiTrainApp.Infrastructure.Records;
 
@@ -8,15 +8,16 @@ namespace MauiTrainApp.Infrastructure.Mappers
     {
         public Exercise ToDomain(ExerciseRecord record)
         {
-            var exercise = new Exercise
+            var exercise = new Exercise(record.Name, record.Description)
             {
                 Id = record.Id,
-                CreatedAt = record.CreatedAt,
+                CreatedAt = record.CreatedAt
             };
 
-            exercise.SetName(record.Name);
-            exercise.SetDescription(record.Description);
-            exercise.SetUpdatedTime(record.UpdatedAt);
+            if (record.UpdatedAt is not null)
+            {
+                exercise.SetUpdatedTime(record.UpdatedAt);
+            }
 
             return exercise;
         }

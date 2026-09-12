@@ -2,9 +2,9 @@
 
 namespace MauiTrainApp.Infrastructure.Records
 {
-    internal class ExerciseRecord : BaseRecord
+    internal record ExerciseRecord : BaseRecord
     {
-        public string Name { get; init; }
+        public required string Name { get; init; }
         public string? Description { get; init; }
     }
 }

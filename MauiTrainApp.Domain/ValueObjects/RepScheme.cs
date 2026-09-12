@@ -1,10 +1,18 @@
-﻿using MauiTrainApp.Domain.Exceptions;
+using MauiTrainApp.Domain.Exceptions;
 
 namespace MauiTrainApp.Domain.ValueObjects
 {
     public record struct RepScheme
     {
-        public required byte Reps { get; init; }
+        public required byte Reps
+        {
+            get;
+            init
+            {
+                if (value == 0) throw new InvariantException("Reps couldn't be 0");
+                field = value;
+            }
+        }
         public required double Weight
         {
             get;

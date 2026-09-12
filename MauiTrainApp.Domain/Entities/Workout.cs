@@ -1,16 +1,29 @@
-﻿using MauiTrainApp.Domain.Entities.Base;
+using MauiTrainApp.Domain.Entities.Base;
 
 namespace MauiTrainApp.Domain.Entities
 {
-    public sealed class Workout : BaseEntity
+    public sealed class Workout : ExerciseSetAggregate
     {
-        private readonly List<ExerciseSet> _exerciseSets = [];
+        public Workout(
+            DateOnly workoutDay,
+            IEnumerable<ExerciseSet>? exerciseSets = null,
+            Guid? trainingPlanId = null)
+            : base(exerciseSets)
+        {
+            WorkoutDay = workoutDay;
+            TrainingPlanId = trainingPlanId;
+        }
 
         #region Properties
 
-        public DateOnly WorkoutDay { get; private set; } = DateOnly.FromDateTime(DateTime.Now);
+        public DateOnly WorkoutDay { get; private set; }
 
-        public IReadOnlyCollection<ExerciseSet> ExerciseSets => _exerciseSets.AsReadOnly();
+        /// <summary>
+        /// План, по которому проводилась тренировка. Null, если тренировка велась без плана.
+        /// </summary>
+        public Guid? TrainingPlanId { get; private set; }
+
+        public bool IsCompleted => ExerciseSets.Count > 0 && ExerciseSets.All(x => x.IsCompleted);
 
         #endregion
 
@@ -19,30 +32,13 @@ namespace MauiTrainApp.Domain.Entities
         public void SetWorkoutDay(DateOnly workoutDay)
         {
             WorkoutDay = workoutDay;
-        }
-
-        public void SetExerciseSets(ICollection<ExerciseSet> exerciseSets)
-        {
-            _exerciseSets.AddRange(exerciseSets);
-        }
-
-        public void AddExerciseSet(ExerciseSet exerciseSet)
-        {
-            _exerciseSets.Add(exerciseSet);
 
             SetUpdatedTime();
         }
 
-        public void RemoveExerciseSet(ExerciseSet exerciseSet)
+        public void SetTrainingPlan(TrainingPlan? trainingPlan)
         {
-            _exerciseSets.Remove(exerciseSet);
-
-            SetUpdatedTime();
-        }
-
-        public void UpdateExerciseSet(int index, ExerciseSet exerciseSet)
-        {
-            _exerciseSets[index] = exerciseSet;
+            TrainingPlanId = trainingPlan?.Id;
 
             SetUpdatedTime();
         }

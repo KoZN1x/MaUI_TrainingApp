@@ -1,10 +1,10 @@
-﻿using MauiTrainApp.Domain.Entities;
+using MauiTrainApp.Domain.Entities;
 using MauiTrainApp.Infrastructure.Interfaces;
 using MauiTrainApp.Infrastructure.Records;
 
 namespace MauiTrainApp.Infrastructure.Mappers
 {
-    internal class ExerciseSetRecordMapper : IChildRecordMapper<ExerciseSet, ExerciseSetRecord, Guid>
+    internal class ExerciseSetRecordMapper : IChildRecordMapper<ExerciseSet, ExerciseSetRecord, ExerciseSetParent>
     {
         private readonly IRecordMapper<Exercise, ExerciseRecord> _exerciseRecordMapper;
 
@@ -15,20 +15,23 @@ namespace MauiTrainApp.Infrastructure.Mappers
 
         public ExerciseSet ToDomain(ExerciseSetRecord record)
         {
-            var exerciseSet = new ExerciseSet
+            var exerciseSet = new ExerciseSet(
+                _exerciseRecordMapper.ToDomain(record.Exercise),
+                record.WorkingSets)
             {
                 Id = record.Id,
                 CreatedAt = record.CreatedAt
             };
 
-            exerciseSet.SetExercise(_exerciseRecordMapper.ToDomain(record.Exercise));
-            exerciseSet.SetWorkingSets(record.WorkingSets);
-            exerciseSet.SetUpdatedTime(record.UpdatedAt);
+            if (record.UpdatedAt is not null)
+            {
+                exerciseSet.SetUpdatedTime(record.UpdatedAt);
+            }
 
             return exerciseSet;
         }
 
-        public ExerciseSetRecord ToRecord(ExerciseSet entity, Guid workoutId)
+        public ExerciseSetRecord ToRecord(ExerciseSet entity, ExerciseSetParent parent)
         {
             return new ExerciseSetRecord
             {
@@ -37,7 +40,8 @@ namespace MauiTrainApp.Infrastructure.Mappers
                 UpdatedAt = entity.UpdatedAt,
                 ExerciseRecordId = entity.Exercise.Id,
                 WorkingSets = entity.WorkingSets.ToList(),
-                WorkoutRecordId = workoutId
+                WorkoutRecordId = parent.WorkoutId,
+                TrainingPlanRecordId = parent.TrainingPlanId
             };
         }
     }

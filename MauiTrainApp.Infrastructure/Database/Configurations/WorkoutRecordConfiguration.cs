@@ -1,4 +1,4 @@
-﻿using MauiTrainApp.Infrastructure.Records;
+using MauiTrainApp.Infrastructure.Records;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -14,6 +14,11 @@ namespace MauiTrainApp.Infrastructure.Database.Configurations
               .WithOne()
               .HasForeignKey(x => x.WorkoutRecordId)
               .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne<TrainingPlanRecord>()
+              .WithMany()
+              .HasForeignKey(x => x.TrainingPlanRecordId)
+              .OnDelete(DeleteBehavior.SetNull);
 
             builder.Property(x => x.WorkoutDay)
                    .IsRequired();
