@@ -9,12 +9,14 @@ namespace MauiTrainApp.Domain.Entities
             DateOnly workoutDay,
             IEnumerable<ExerciseSet>? exerciseSets = null,
             Guid? trainingPlanId = null,
-            TimeSpan? duration = null)
+            TimeSpan? duration = null,
+            DateTimeOffset? startedAt = null)
             : base(exerciseSets)
         {
             WorkoutDay = workoutDay;
             TrainingPlanId = trainingPlanId;
             Duration = EnsureDuration(duration);
+            StartedAt = startedAt ?? DateTimeOffset.UtcNow;
         }
 
         #region Properties
@@ -24,6 +26,8 @@ namespace MauiTrainApp.Domain.Entities
         public Guid? TrainingPlanId { get; private set; }
 
         public TimeSpan? Duration { get; private set; }
+
+        public DateTimeOffset StartedAt { get; private set; }
 
         public bool IsCompleted => ExerciseSets.Count > 0 && ExerciseSets.All(x => x.IsCompleted);
 
@@ -45,6 +49,16 @@ namespace MauiTrainApp.Domain.Entities
             TrainingPlanId = trainingPlan?.Id;
 
             SetUpdatedTime();
+        }
+
+        public void CompleteAt(DateTimeOffset completedAt)
+        {
+            if (completedAt < StartedAt)
+            {
+                throw new InvariantException("Workout couldn't be completed before it started");
+            }
+
+            SetDuration(completedAt - StartedAt);
         }
 
         public void SetDuration(TimeSpan? duration)

@@ -16,4 +16,6 @@ public interface IWorkoutReadRepository : IReadRepository<WorkoutListItemReadMod
     Task<Guid?> GetLastWorkoutIdAsync(Guid trainingPlanId, CancellationToken cancellationToken = default);
 
     Task<WorkoutListItemReadModel?> GetActiveAsync(DateOnly day, CancellationToken cancellationToken = default);
+
+    Task<Guid?> GetLastTrainingPlanIdAsync(CancellationToken cancellationToken = default);
 }

@@ -18,6 +18,7 @@ using MauiTrainApp.Application.CQRS.Commands.UpdatePlannedExerciseSet;
 using MauiTrainApp.Application.CQRS.Queries.GetActiveWorkout;
 using MauiTrainApp.Application.CQRS.Queries.GetExerciseProgress;
 using MauiTrainApp.Application.CQRS.Queries.GetExercises;
+using MauiTrainApp.Application.CQRS.Queries.GetNextTrainingPlan;
 using MauiTrainApp.Application.CQRS.Queries.GetProgressSummary;
 using MauiTrainApp.Application.CQRS.Queries.GetTrainingPlanDetails;
 using MauiTrainApp.Application.CQRS.Queries.GetTrainingPlans;
@@ -76,7 +77,8 @@ namespace MauiTrainApp.Application.DI
                     .AddQuery<GetWorkoutDetailsQuery, GetWorkoutDetailsResult, GetWorkoutDetailsQueryHandler>()
                     .AddQuery<GetProgressSummaryQuery, GetProgressSummaryResult, GetProgressSummaryQueryHandler>()
                     .AddQuery<GetExerciseProgressQuery, GetExerciseProgressResult, GetExerciseProgressQueryHandler>()
-                    .AddQuery<GetActiveWorkoutQuery, GetActiveWorkoutResult, GetActiveWorkoutQueryHandler>();
+                    .AddQuery<GetActiveWorkoutQuery, GetActiveWorkoutResult, GetActiveWorkoutQueryHandler>()
+                    .AddQuery<GetNextTrainingPlanQuery, GetNextTrainingPlanResult, GetNextTrainingPlanQueryHandler>();
             }
         }
     }

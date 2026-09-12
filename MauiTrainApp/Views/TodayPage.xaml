@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<base:ContentPageBase
+    x:Class="MauiTrainApp.Views.TodayPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:base="clr-namespace:MauiTrainApp.Views.Base"
+    xmlns:controls="clr-namespace:MauiTrainApp.Controls"
+    xmlns:items="clr-namespace:MauiTrainApp.ViewModels.Items"
+    xmlns:viewModels="clr-namespace:MauiTrainApp.ViewModels"
+    x:DataType="viewModels:TodayViewModel"
+    Title="Сегодня">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <ActivityIndicator
+            Grid.Row="0"
+            HeightRequest="3"
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}" />
+
+        <RefreshView
+            Grid.Row="1"
+            Command="{Binding LoadCommand}"
+            IsRefreshing="{Binding IsBusy, Mode=OneWay}">
+
+            <ScrollView>
+                <VerticalStackLayout Padding="{StaticResource Space6}" Spacing="{StaticResource Space6}">
+
+                    <Label Style="{StaticResource Kicker}" Text="{Binding TodayText}" />
+
+                    <Border Style="{StaticResource Card}">
+                        <VerticalStackLayout Spacing="{StaticResource Space3}">
+                            <Label Style="{StaticResource SectionCaption}" Text="{Binding HeroKicker}" />
+                            <Label Style="{StaticResource Headline}" Text="{Binding HeroTitle}" />
+                            <Label Style="{StaticResource Muted}" Text="{Binding HeroSubtitle}" />
+                            <Button
+                                Command="{Binding StartOrContinueCommand}"
+                                Style="{StaticResource PrimaryButton}"
+                                Text="{Binding HeroActionText}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <HorizontalStackLayout
+                            BindableLayout.ItemsSource="{Binding Week}"
+                            HorizontalOptions="Center"
+                            Spacing="{StaticResource Space4}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="items:WeekDayViewModel">
+                                    <VerticalStackLayout Spacing="{StaticResource Space1}" WidthRequest="32">
+                                        <Label
+                                            FontSize="10"
+                                            HorizontalTextAlignment="Center"
+                                            Style="{StaticResource Muted}"
+                                            Text="{Binding Label}" />
+                                        <Label
+                                            FontSize="14"
+                                            HorizontalTextAlignment="Center"
+                                            Text="{Binding DayNumber}" />
+                                        <BoxView
+                                            BackgroundColor="{StaticResource Accent}"
+                                            CornerRadius="3"
+                                            HeightRequest="6"
+                                            HorizontalOptions="Center"
+                                            IsVisible="{Binding HasWorkout}"
+                                            WidthRequest="6" />
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <controls:SectionHeader
+                        ActionCommand="{Binding OpenProgressCommand}"
+                        ActionText="Прогресс"
+                        Title="За 30 дней" />
+
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="{StaticResource Space3}">
+                        <controls:StatTile Caption="Тренировок" Value="{Binding WorkoutCountText}" />
+                        <controls:StatTile
+                            Grid.Column="1"
+                            Caption="Объём"
+                            Delta="{Binding VolumeDeltaText}"
+                            Value="{Binding VolumeText}" />
+                        <controls:StatTile
+                            Grid.Column="2"
+                            Caption="Недель подряд"
+                            Value="{Binding StreakText}" />
+                    </Grid>
+
+                    <controls:SectionHeader
+                        ActionCommand="{Binding OpenHistoryCommand}"
+                        ActionText="Вся история"
+                        IsVisible="{Binding HasRecentWorkouts}"
+                        Title="Последние тренировки" />
+
+                    <VerticalStackLayout
+                        BindableLayout.ItemsSource="{Binding RecentWorkouts}"
+                        Spacing="{StaticResource Space3}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="items:WorkoutRowViewModel">
+                                <Border Style="{StaticResource Card}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:TodayViewModel}}, Path=OpenWorkoutCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space3}">
+                                        <VerticalStackLayout Spacing="{StaticResource Space1}">
+                                            <Label Style="{StaticResource CardTitle}" Text="{Binding Title}" />
+                                            <Label Style="{StaticResource Muted}" Text="{Binding DayText}" />
+                                            <Label Style="{StaticResource Muted}" Text="{Binding MetaText}" />
+                                        </VerticalStackLayout>
+                                        <controls:TagChip
+                                            Grid.Column="1"
+                                            Kind="{Binding TagKind}"
+                                            Text="{Binding TagText}"
+                                            VerticalOptions="Start" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </ScrollView>
+
+        </RefreshView>
+
+    </Grid>
+
+</base:ContentPageBase>

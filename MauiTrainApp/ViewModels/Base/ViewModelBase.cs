@@ -25,6 +25,11 @@ namespace MauiTrainApp.ViewModels.Base
             return Task.CompletedTask;
         }
 
+        public virtual Task DisappearingAsync()
+        {
+            return Task.CompletedTask;
+        }
+
         protected async Task RunAsync(Func<CancellationToken, Task> operation, CancellationToken cancellationToken = default)
         {
             if (IsBusy)

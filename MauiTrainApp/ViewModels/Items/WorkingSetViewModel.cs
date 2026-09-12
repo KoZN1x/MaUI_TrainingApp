@@ -6,9 +6,11 @@ namespace MauiTrainApp.ViewModels.Items
     public sealed partial class WorkingSetViewModel : ObservableObject
     {
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(RepsText))]
         private byte _reps;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(WeightText))]
         private double _weight;
 
         [ObservableProperty]
@@ -28,5 +30,11 @@ namespace MauiTrainApp.ViewModels.Items
         public int Index { get; }
 
         public int Number => Index + 1;
+
+        public string RepsText => $"{Reps}";
+
+        public string WeightText => Weight % 1 == 0 ? $"{Weight:0}" : $"{Weight:0.#}";
+
+        public double Volume => IsCompleted ? Reps * Weight : 0;
     }
 }

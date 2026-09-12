@@ -4,7 +4,8 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:base="clr-namespace:MauiTrainApp.Views.Base"
-    xmlns:readModels="clr-namespace:MauiTrainApp.Domain.ReadModels;assembly=MauiTrainApp.Domain"
+    xmlns:controls="clr-namespace:MauiTrainApp.Controls"
+    xmlns:items="clr-namespace:MauiTrainApp.ViewModels.Items"
     xmlns:viewModels="clr-namespace:MauiTrainApp.ViewModels"
     x:DataType="viewModels:TrainingPlansViewModel"
     Title="Планы">
@@ -13,48 +14,101 @@
 
         <ActivityIndicator
             Grid.Row="0"
-            HeightRequest="4"
+            HeightRequest="3"
             IsRunning="{Binding IsBusy}"
             IsVisible="{Binding IsBusy}" />
 
-        <Label
+        <VerticalStackLayout
             Grid.Row="1"
-            Margin="24"
-            HorizontalOptions="Center"
+            Padding="{StaticResource Space8}"
             IsVisible="{Binding IsEmpty}"
-            Text="Планов пока нет"
-            VerticalOptions="Center" />
+            Spacing="{StaticResource Space4}"
+            VerticalOptions="Center">
+            <Label
+                HorizontalTextAlignment="Center"
+                Style="{StaticResource CardTitle}"
+                Text="Планов пока нет" />
+            <Label
+                HorizontalTextAlignment="Center"
+                Style="{StaticResource Muted}"
+                Text="План — это набор упражнений с подходами, с которого начинается тренировка" />
+            <Button
+                Command="{Binding CreatePlanCommand}"
+                Style="{StaticResource PrimaryButton}"
+                Text="Создать план" />
+        </VerticalStackLayout>
 
         <RefreshView
             Grid.Row="1"
             Command="{Binding LoadCommand}"
-            IsRefreshing="{Binding IsBusy, Mode=OneWay}">
+            IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+            IsVisible="{Binding IsEmpty, Converter={StaticResource InvertedBool}}">
 
-            <CollectionView ItemsSource="{Binding TrainingPlans}">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="readModels:TrainingPlanListItemReadModel">
-                        <Border Margin="16,8" Padding="16">
-                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <ScrollView>
+                <VerticalStackLayout Padding="{StaticResource Space6}" Spacing="{StaticResource Space4}">
 
-                                <VerticalStackLayout Grid.Column="0" Spacing="4">
-                                    <Label FontAttributes="Bold" Text="{Binding Name}" />
-                                    <Label
-                                        FontSize="12"
-                                        Opacity="0.6"
-                                        Text="{Binding ExerciseSetCount, StringFormat='Упражнений: {0}'}" />
-                                </VerticalStackLayout>
+                    <controls:SectionHeader
+                        ActionCommand="{Binding CreatePlanCommand}"
+                        ActionText="+ План"
+                        Title="Тренировочные планы" />
 
-                                <Button
-                                    Grid.Column="1"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:TrainingPlansViewModel}}, Path=StartWorkoutCommand}"
-                                    CommandParameter="{Binding .}"
-                                    Text="Начать" />
+                    <VerticalStackLayout
+                        BindableLayout.ItemsSource="{Binding TrainingPlans}"
+                        Spacing="{StaticResource Space4}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="items:TrainingPlanRowViewModel">
+                                <Border Style="{StaticResource Card}">
+                                    <VerticalStackLayout Spacing="{StaticResource Space3}">
 
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space3}">
+                                            <VerticalStackLayout Spacing="{StaticResource Space1}">
+                                                <Label Style="{StaticResource CardTitle}" Text="{Binding Name}" />
+                                                <Label Style="{StaticResource Muted}" Text="{Binding SummaryText}" />
+                                            </VerticalStackLayout>
+                                            <controls:TagChip
+                                                Grid.Column="1"
+                                                IsVisible="{Binding IsNext}"
+                                                Kind="Accent"
+                                                Text="Следующий"
+                                                VerticalOptions="Start" />
+                                        </Grid>
+
+                                        <FlexLayout
+                                            BindableLayout.ItemsSource="{Binding ExerciseNames}"
+                                            Direction="Row"
+                                            Wrap="Wrap">
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate x:DataType="x:String">
+                                                    <controls:TagChip
+                                                        Margin="0,0,6,6"
+                                                        Kind="Outline"
+                                                        Text="{Binding .}" />
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </FlexLayout>
+
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space3}">
+                                            <Button
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:TrainingPlansViewModel}}, Path=StartWorkoutCommand}"
+                                                CommandParameter="{Binding .}"
+                                                Style="{StaticResource PrimaryButton}"
+                                                Text="Начать" />
+                                            <Button
+                                                Grid.Column="1"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:TrainingPlansViewModel}}, Path=EditPlanCommand}"
+                                                CommandParameter="{Binding .}"
+                                                Style="{StaticResource SecondaryButton}"
+                                                Text="Изменить" />
+                                        </Grid>
+
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </ScrollView>
 
         </RefreshView>
 

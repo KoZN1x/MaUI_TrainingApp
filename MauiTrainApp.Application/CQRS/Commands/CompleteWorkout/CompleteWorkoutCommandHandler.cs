@@ -27,10 +27,14 @@ internal sealed class CompleteWorkoutCommandHandler
             throw new InvariantException("Workout without a single completed working set couldn't be finished");
         }
 
-        workout.SetDuration(command.Duration);
+        workout.CompleteAt(command.CompletedAt);
 
         await _workouts.UpdateAsync(workout, cancellationToken);
 
-        return new CompleteWorkoutResult(workout.Id, workout.IsCompleted, workout.TotalVolume);
+        return new CompleteWorkoutResult(
+            workout.Id,
+            workout.IsCompleted,
+            workout.TotalVolume,
+            workout.Duration ?? TimeSpan.Zero);
     }
 }

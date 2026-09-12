@@ -55,6 +55,22 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
                 .FirstOrDefault();
         }
 
+        public async Task<Guid?> GetLastTrainingPlanIdAsync(CancellationToken cancellationToken = default)
+        {
+            var candidates = await Query
+                .Where(x => x.TrainingPlanRecordId != null)
+                .OrderByDescending(x => x.WorkoutDay)
+                .Select(x => new { x.TrainingPlanRecordId, x.WorkoutDay, x.CreatedAt })
+                .Take(SameDayCandidates)
+                .ToListAsync(cancellationToken);
+
+            return candidates
+                .OrderByDescending(x => x.WorkoutDay)
+                .ThenByDescending(x => x.CreatedAt)
+                .Select(x => x.TrainingPlanRecordId)
+                .FirstOrDefault();
+        }
+
         public async Task<WorkoutListItemReadModel?> GetActiveAsync(
             DateOnly day,
             CancellationToken cancellationToken = default)
@@ -92,6 +108,7 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
                     x.WorkoutDay,
                     x.TrainingPlanRecordId,
                     x.DurationSeconds,
+                    x.StartedAt,
                     TrainingPlanName = x.TrainingPlan!.Name,
                     ExerciseSets = x.ExerciseSets
                         .Select(exerciseSet => new ExerciseSetRow(
@@ -111,7 +128,8 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
                     workout.TrainingPlanRecordId,
                     workout.TrainingPlanName,
                     workout.ExerciseSets.ToReadModels(),
-                    workout.DurationSeconds is null ? null : TimeSpan.FromSeconds(workout.DurationSeconds.Value));
+                    workout.DurationSeconds is null ? null : TimeSpan.FromSeconds(workout.DurationSeconds.Value),
+                    workout.StartedAt);
         }
 
         private static IQueryable<WorkoutListRow> Project(IQueryable<WorkoutRecord> query)

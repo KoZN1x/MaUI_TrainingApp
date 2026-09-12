@@ -12,6 +12,8 @@ namespace MauiTrainApp.Infrastructure.Records
 
         public int? DurationSeconds { get; init; }
 
+        public DateTimeOffset StartedAt { get; init; }
+
         public ICollection<ExerciseSetRecord> ExerciseSets { get; init; } = [];
     }
 }

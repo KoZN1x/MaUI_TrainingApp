@@ -21,6 +21,8 @@ namespace MauiTrainApp.DI
                     .AddSingleton<IExceptionPresenter, DialogExceptionPresenter>()
                     .AddSingleton<INavigator, ShellNavigator>()
                     .AddSingleton<AppStartup>()
+                    .AddSingleton<IDialogService, DialogService>()
+                    .AddSingleton<IAppSettings, AppSettings>()
                     .AddTransient<IWorkoutClock, WorkoutClock>()
                     .AddViewModels()
                     .AddPages();
@@ -29,6 +31,7 @@ namespace MauiTrainApp.DI
             private IServiceCollection AddViewModels()
             {
                 return services
+                    .AddTransient<TodayViewModel>()
                     .AddTransient<TrainingPlansViewModel>()
                     .AddTransient<WorkoutViewModel>();
             }

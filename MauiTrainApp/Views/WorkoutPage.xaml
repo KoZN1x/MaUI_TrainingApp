@@ -9,80 +9,172 @@
     x:DataType="viewModels:WorkoutViewModel"
     Title="{Binding Title}">
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,*,Auto">
 
-        <VerticalStackLayout Grid.Row="0" Padding="16,12" Spacing="8">
-            <Label FontSize="12" Opacity="0.6" Text="{Binding Subtitle}" />
-            <ProgressBar Progress="{Binding Progress}" />
-        </VerticalStackLayout>
+        <Border Grid.Row="0" Margin="{StaticResource Space6}" Style="{StaticResource Card}">
+            <VerticalStackLayout Spacing="{StaticResource Space3}">
 
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Exercises}">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="items:WorkoutExerciseViewModel">
-                    <Border Margin="16,8" Padding="16">
-                        <VerticalStackLayout Spacing="12">
+                <Grid ColumnDefinitions="*,Auto">
+                    <VerticalStackLayout Spacing="{StaticResource Space1}">
+                        <Label Style="{StaticResource SectionCaption}" Text="{Binding DayText}" />
+                        <Label Style="{StaticResource CardTitle}" Text="{Binding Title}" />
+                    </VerticalStackLayout>
+                    <Label
+                        Grid.Column="1"
+                        Style="{StaticResource Numeric}"
+                        Text="{Binding ElapsedText}"
+                        VerticalOptions="Center" />
+                </Grid>
 
-                            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
-                                <Label
-                                    Grid.Column="0"
-                                    FontAttributes="Bold"
-                                    Text="{Binding ExerciseName}"
-                                    VerticalOptions="Center" />
-                                <Label
-                                    Grid.Column="1"
-                                    Opacity="0.6"
-                                    Text="{Binding Progress}"
-                                    VerticalOptions="Center" />
+                <ProgressBar Progress="{Binding Progress}" />
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Style="{StaticResource Muted}" Text="{Binding ProgressText}" />
+                    <Label Grid.Column="1" Style="{StaticResource Muted}" Text="{Binding VolumeText}" />
+                </Grid>
+
+            </VerticalStackLayout>
+        </Border>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout
+                Padding="17,0"
+                BindableLayout.ItemsSource="{Binding Exercises}"
+                Spacing="{StaticResource Space3}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="items:WorkoutExerciseViewModel">
+                        <Border Style="{StaticResource Card}">
+                            <VerticalStackLayout Spacing="{StaticResource Space3}">
+
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource Space3}">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=ToggleExerciseCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Grid.GestureRecognizers>
+
+                                    <Border
+                                        Padding="0"
+                                        BackgroundColor="{StaticResource Accent900}"
+                                        HeightRequest="28"
+                                        StrokeShape="RoundRectangle 14"
+                                        StrokeThickness="0"
+                                        WidthRequest="28">
+                                        <Label
+                                            FontSize="13"
+                                            HorizontalOptions="Center"
+                                            Text="{Binding BadgeText}"
+                                            TextColor="{StaticResource Accent300}"
+                                            VerticalOptions="Center" />
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1" Spacing="{StaticResource Space1}">
+                                        <Label Style="{StaticResource CardTitle}" Text="{Binding ExerciseName}" />
+                                        <Label Style="{StaticResource Muted}" Text="{Binding SummaryText}" />
+                                    </VerticalStackLayout>
+
+                                    <Button
+                                        Grid.Column="2"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=CompleteExerciseCommand}"
+                                        CommandParameter="{Binding .}"
+                                        IsVisible="{Binding IsCompleted, Converter={StaticResource InvertedBool}}"
+                                        Style="{StaticResource GhostButton}"
+                                        Text="Отметить всё" />
+                                </Grid>
+
+                                <VerticalStackLayout
+                                    BindableLayout.ItemsSource="{Binding WorkingSets}"
+                                    IsVisible="{Binding IsExpanded}"
+                                    Spacing="{StaticResource Space3}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="items:WorkingSetViewModel">
+                                            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto" ColumnSpacing="{StaticResource Space2}">
+
+                                                <Label
+                                                    Grid.Column="0"
+                                                    Style="{StaticResource Muted}"
+                                                    Text="{Binding Number, StringFormat='#{0}'}"
+                                                    VerticalOptions="Center"
+                                                    WidthRequest="24" />
+
+                                                <Button
+                                                    Grid.Column="1"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=DecreaseWeightCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    Style="{StaticResource StepButton}"
+                                                    Text="−" />
+                                                <Label
+                                                    Grid.Column="2"
+                                                    HorizontalTextAlignment="Center"
+                                                    Text="{Binding WeightText}"
+                                                    VerticalOptions="Center"
+                                                    WidthRequest="40" />
+                                                <Button
+                                                    Grid.Column="3"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=IncreaseWeightCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    Style="{StaticResource StepButton}"
+                                                    Text="+" />
+
+                                                <Button
+                                                    Grid.Column="4"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=DecreaseRepsCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    Style="{StaticResource StepButton}"
+                                                    Text="−" />
+                                                <Label
+                                                    Grid.Column="5"
+                                                    HorizontalTextAlignment="Center"
+                                                    Text="{Binding RepsText}"
+                                                    VerticalOptions="Center"
+                                                    WidthRequest="30" />
+                                                <Button
+                                                    Grid.Column="6"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=IncreaseRepsCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    Style="{StaticResource StepButton}"
+                                                    Text="+" />
+
+                                                <Button
+                                                    Grid.Column="8"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=ToggleWorkingSetCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    Style="{StaticResource StepButton}"
+                                                    Text="{Binding IsCompleted, Converter={StaticResource WorkingSetMark}}" />
+
+                                            </Grid>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+
                                 <Button
-                                    Grid.Column="2"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=CompleteExerciseCommand}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=AddWorkingSetCommand}"
                                     CommandParameter="{Binding .}"
-                                    Text="Всё" />
-                            </Grid>
+                                    IsVisible="{Binding IsExpanded}"
+                                    Style="{StaticResource GhostButton}"
+                                    Text="+ Подход" />
 
-                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding WorkingSets}" Spacing="8">
-                                <BindableLayout.ItemTemplate>
-                                    <DataTemplate x:DataType="items:WorkingSetViewModel">
-                                        <Grid ColumnDefinitions="Auto,*,*,Auto" ColumnSpacing="8">
-
-                                            <Label
-                                                Grid.Column="0"
-                                                Opacity="0.6"
-                                                Text="{Binding Number, StringFormat='#{0}'}"
-                                                VerticalOptions="Center"
-                                                WidthRequest="28" />
-
-                                            <Entry
-                                                Grid.Column="1"
-                                                Keyboard="Numeric"
-                                                Placeholder="повторы"
-                                                Text="{Binding Reps}"
-                                                Unfocused="OnWorkingSetUnfocused" />
-
-                                            <Entry
-                                                Grid.Column="2"
-                                                Keyboard="Numeric"
-                                                Placeholder="вес"
-                                                Text="{Binding Weight}"
-                                                Unfocused="OnWorkingSetUnfocused" />
-
-                                            <Button
-                                                Grid.Column="3"
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=ToggleWorkingSetCommand}"
-                                                CommandParameter="{Binding .}"
-                                                Text="{Binding IsCompleted, Converter={StaticResource WorkingSetMark}}"
-                                                WidthRequest="48" />
-
-                                        </Grid>
-                                    </DataTemplate>
-                                </BindableLayout.ItemTemplate>
                             </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+        </ScrollView>
 
-                        </VerticalStackLayout>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+        <VerticalStackLayout
+            Grid.Row="2"
+            Padding="{StaticResource Space6}"
+            IsVisible="{Binding IsLoaded}"
+            Spacing="{StaticResource Space3}">
+            <Button
+                Command="{Binding CompleteWorkoutCommand}"
+                Style="{StaticResource PrimaryButton}"
+                Text="{Binding CompleteText}" />
+            <Button
+                Command="{Binding CancelWorkoutCommand}"
+                Style="{StaticResource GhostButton}"
+                Text="Отменить тренировку" />
+        </VerticalStackLayout>
 
     </Grid>
 

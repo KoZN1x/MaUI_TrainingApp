@@ -20,5 +20,12 @@ namespace MauiTrainApp.Views.Base
 
             await _viewModel.AppearingAsync();
         }
+
+        protected override async void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+            await _viewModel.DisappearingAsync();
+        }
     }
 }

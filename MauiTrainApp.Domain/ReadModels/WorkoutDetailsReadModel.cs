@@ -6,7 +6,8 @@ public sealed record WorkoutDetailsReadModel(
     Guid? TrainingPlanId,
     string? TrainingPlanName,
     IReadOnlyCollection<ExerciseSetReadModel> ExerciseSets,
-    TimeSpan? Duration)
+    TimeSpan? Duration,
+    DateTimeOffset StartedAt)
 {
     public double TotalVolume => ExerciseSets.Sum(x => x.CompletedVolume);
 
