@@ -42,6 +42,7 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
                 current.Count,
                 current.Sum(CompletedVolume),
                 current.Sum(CompletedWorkingSetCount),
+                await CountRecordsAsync(from, to, cancellationToken),
                 AverageDuration(current),
                 rows.Where(x => x.WorkoutDay < from).Sum(CompletedVolume),
                 WeeklyVolume(current, from, to),
@@ -83,7 +84,7 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
                     x.WorkoutDay,
                     x.ExerciseSets
                         .Where(set => set.ExerciseRecordId == exerciseId)
-                        .SelectMany(set => set.WorkingSets)
+                        .Select(set => set.WorkingSets)
                         .ToList()))
                 .ToListAsync(cancellationToken);
 
@@ -96,9 +97,62 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
                 sessions.Select(ToSession).Where(x => x.WorkingSets.Count > 0).ToList());
         }
 
+        private async Task<int> CountRecordsAsync(DateOnly from, DateOnly to, CancellationToken cancellationToken)
+        {
+            var rows = await Workouts
+                .Where(x => x.WorkoutDay <= to)
+                .Select(x => new ExerciseBestWorkout(
+                    x.WorkoutDay,
+                    x.ExerciseSets
+                        .Select(set => new ExerciseWorkingSets(set.ExerciseRecordId, set.WorkingSets))
+                        .ToList()))
+                .ToListAsync(cancellationToken);
+
+            var sessions = rows
+                .SelectMany(workout => workout.ExerciseSets.Select(set => new
+                {
+                    set.ExerciseId,
+                    workout.WorkoutDay,
+                    BestWeight = set.WorkingSets
+                        .Where(workingSet => workingSet.IsCompleted)
+                        .Select(workingSet => workingSet.RepScheme.Weight)
+                        .DefaultIfEmpty(0)
+                        .Max()
+                }))
+                .Where(x => x.BestWeight > 0)
+                .GroupBy(x => new { x.ExerciseId, x.WorkoutDay })
+                .Select(x => new
+                {
+                    x.Key.ExerciseId,
+                    x.Key.WorkoutDay,
+                    BestWeight = x.Max(item => item.BestWeight)
+                });
+
+            var records = 0;
+
+            foreach (var exercise in sessions.GroupBy(x => x.ExerciseId))
+            {
+                var best = 0d;
+                var isFirstSession = true;
+
+                foreach (var session in exercise.OrderBy(x => x.WorkoutDay))
+                {
+                    if (!isFirstSession && session.BestWeight > best && session.WorkoutDay >= from)
+                    {
+                        records++;
+                    }
+
+                    best = Math.Max(best, session.BestWeight);
+                    isFirstSession = false;
+                }
+            }
+
+            return records;
+        }
+
         private static ExerciseSessionReadModel ToSession(ExerciseSessionRow row)
         {
-            var completed = row.WorkingSets.Where(x => x.IsCompleted).ToList();
+            var completed = row.WorkingSets.SelectMany(x => x).Where(x => x.IsCompleted).ToList();
             var best = completed.OrderByDescending(x => x.RepScheme.Weight).FirstOrDefault();
 
             return new ExerciseSessionReadModel(
@@ -178,9 +232,15 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
 
         private sealed record MuscleWorkingSets(MuscleGroup MuscleGroup, ICollection<WorkingSet> WorkingSets);
 
+        private sealed record ExerciseBestWorkout(
+            DateOnly WorkoutDay,
+            ICollection<ExerciseWorkingSets> ExerciseSets);
+
+        private sealed record ExerciseWorkingSets(Guid ExerciseId, ICollection<WorkingSet> WorkingSets);
+
         private sealed record ExerciseSessionRow(
             Guid WorkoutId,
             DateOnly WorkoutDay,
-            ICollection<WorkingSet> WorkingSets);
+            ICollection<ICollection<WorkingSet>> WorkingSets);
     }
 }

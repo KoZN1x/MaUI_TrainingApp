@@ -3,9 +3,9 @@ using MauiTrainApp.Views.Base;
 
 namespace MauiTrainApp.Views
 {
-    public partial class ProgressPage : ContentPageBase
+    public partial class ExerciseDetailPage : ContentPageBase
     {
-        public ProgressPage(ProgressViewModel viewModel)
+        public ExerciseDetailPage(ExerciseDetailViewModel viewModel)
             : base(viewModel)
         {
             InitializeComponent();

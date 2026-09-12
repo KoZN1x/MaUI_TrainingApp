@@ -4,6 +4,7 @@ public sealed record ProgressSummaryReadModel(
     int WorkoutCount,
     double TotalVolume,
     int CompletedWorkingSetCount,
+    int RecordCount,
     TimeSpan AverageDuration,
     double PreviousPeriodVolume,
     IReadOnlyCollection<WeeklyVolumeReadModel> WeeklyVolume,

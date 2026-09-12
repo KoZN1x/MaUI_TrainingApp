@@ -1,40 +1,124 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<ContentPage
+<?xml version="1.0" encoding="utf-8" ?>
+<base:ContentPageBase
     x:Class="MauiTrainApp.Views.ProgressPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:base="clr-namespace:MauiTrainApp.Views.Base"
     xmlns:controls="clr-namespace:MauiTrainApp.Controls"
+    xmlns:items="clr-namespace:MauiTrainApp.ViewModels.Items"
+    xmlns:viewModels="clr-namespace:MauiTrainApp.ViewModels"
+    x:DataType="viewModels:ProgressViewModel"
     Title="Прогресс">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="{StaticResource Space6}" Spacing="{StaticResource Space6}">
+    <Grid RowDefinitions="Auto,*">
 
-            <controls:SectionHeader Title="Витрина примитивов" ActionText="Фаза 3" />
+        <ActivityIndicator
+            Grid.Row="0"
+            HeightRequest="3"
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}" />
 
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space3}">
-                <controls:StatTile
-                    Caption="Объём за 30 дней"
-                    Delta="+12 %"
-                    Value="12,4 т" />
-                <controls:StatTile
-                    Grid.Column="1"
-                    Caption="Тренировок в неделю"
-                    Value="3,2" />
-            </Grid>
+        <RefreshView
+            Grid.Row="1"
+            Command="{Binding LoadCommand}"
+            IsRefreshing="{Binding IsBusy, Mode=OneWay}">
 
-            <HorizontalStackLayout Spacing="{StaticResource Space2}">
-                <controls:TagChip Kind="Accent" Text="Следующий" />
-                <controls:TagChip Kind="Outline" Text="Грудь" />
-                <controls:TagChip Kind="Neutral" Text="45 мин" />
-            </HorizontalStackLayout>
+            <ScrollView>
+                <VerticalStackLayout Padding="{StaticResource Space6}" Spacing="{StaticResource Space6}">
 
-            <controls:BarChartView x:Name="WeeklyVolume" ChartHeight="110" />
+                    <Label Style="{StaticResource Kicker}" Text="{Binding PeriodText}" />
 
-            <Label
-                Style="{StaticResource Muted}"
-                Text="Экран собирается на фазе 3 плана" />
+                    <Grid
+                        ColumnDefinitions="*,*"
+                        ColumnSpacing="{StaticResource Space3}"
+                        RowDefinitions="Auto,Auto"
+                        RowSpacing="{StaticResource Space3}">
+                        <controls:StatTile
+                            Caption="Объём"
+                            Delta="{Binding VolumeDeltaText}"
+                            Value="{Binding VolumeText}" />
+                        <controls:StatTile
+                            Grid.Column="1"
+                            Caption="Тренировок в неделю"
+                            Value="{Binding WorkoutsPerWeekText}" />
+                        <controls:StatTile
+                            Grid.Row="1"
+                            Caption="Подходов"
+                            Value="{Binding WorkingSetCountText}" />
+                        <controls:StatTile
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Caption="Рекордов"
+                            Value="{Binding RecordCountText}" />
+                    </Grid>
 
-        </VerticalStackLayout>
-    </ScrollView>
+                    <controls:SectionHeader Title="Объём по неделям" />
 
-</ContentPage>
+                    <Border Style="{StaticResource Card}">
+                        <controls:BarChartView ChartHeight="110" ItemsSource="{Binding WeeklyVolume}" />
+                    </Border>
+
+                    <controls:SectionHeader Title="Распределение по мышцам" />
+
+                    <Border IsVisible="{Binding HasData, Converter={StaticResource InvertedBool}}" Style="{StaticResource Card}">
+                        <Label
+                            Style="{StaticResource Muted}"
+                            Text="За этот период ещё нет закрытых подходов" />
+                    </Border>
+
+                    <VerticalStackLayout
+                        BindableLayout.ItemsSource="{Binding MuscleShares}"
+                        Spacing="{StaticResource Space4}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="items:MuscleShareViewModel">
+                                <VerticalStackLayout Spacing="{StaticResource Space2}">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Text="{Binding Name}" />
+                                        <Label
+                                            Grid.Column="1"
+                                            Style="{StaticResource Muted}"
+                                            Text="{Binding ShareText}" />
+                                    </Grid>
+                                    <ProgressBar Progress="{Binding Share}" />
+                                    <Label Style="{StaticResource Muted}" Text="{Binding VolumeText}" />
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                    <controls:SectionHeader
+                        ActionCommand="{Binding OpenExercisesCommand}"
+                        ActionText="Все"
+                        Title="Упражнения" />
+
+                    <VerticalStackLayout
+                        BindableLayout.ItemsSource="{Binding Exercises}"
+                        Spacing="{StaticResource Space3}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="items:ExerciseRowViewModel">
+                                <Border Style="{StaticResource Card}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ProgressViewModel}}, Path=OpenExerciseCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space3}">
+                                        <Label Text="{Binding Name}" VerticalOptions="Center" />
+                                        <controls:TagChip
+                                            Grid.Column="1"
+                                            Kind="Outline"
+                                            Text="{Binding MuscleName}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </ScrollView>
+
+        </RefreshView>
+
+    </Grid>
+
+</base:ContentPageBase>

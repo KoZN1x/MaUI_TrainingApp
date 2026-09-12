@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<base:ContentPageBase
+    x:Class="MauiTrainApp.Views.ExerciseDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:base="clr-namespace:MauiTrainApp.Views.Base"
+    xmlns:controls="clr-namespace:MauiTrainApp.Controls"
+    xmlns:items="clr-namespace:MauiTrainApp.ViewModels.Items"
+    xmlns:viewModels="clr-namespace:MauiTrainApp.ViewModels"
+    x:DataType="viewModels:ExerciseDetailViewModel"
+    Title="{Binding Name}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <ActivityIndicator
+            Grid.Row="0"
+            HeightRequest="3"
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="{StaticResource Space6}" Spacing="{StaticResource Space6}">
+
+                <VerticalStackLayout Spacing="{StaticResource Space3}">
+                    <Label Style="{StaticResource Headline}" Text="{Binding Name}" />
+                    <HorizontalStackLayout Spacing="{StaticResource Space2}">
+                        <controls:TagChip Kind="Accent" Text="{Binding MuscleName}" />
+                        <controls:TagChip Kind="Outline" Text="{Binding PlansText}" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="{StaticResource Space3}">
+
+                        <controls:SectionHeader
+                            ActionCommand="{Binding StartEditCommand}"
+                            ActionText="Изменить"
+                            IsVisible="{Binding IsEditing, Converter={StaticResource InvertedBool}}"
+                            Title="Описание" />
+
+                        <Label
+                            IsVisible="{Binding IsEditing, Converter={StaticResource InvertedBool}}"
+                            Text="{Binding Description}" />
+
+                        <Label
+                            IsVisible="{Binding HasDescription, Converter={StaticResource InvertedBool}}"
+                            Style="{StaticResource Muted}"
+                            Text="Описания пока нет" />
+
+                        <VerticalStackLayout IsVisible="{Binding IsEditing}" Spacing="{StaticResource Space3}">
+                            <Editor
+                                AutoSize="TextChanges"
+                                MinimumHeightRequest="90"
+                                Placeholder="Техника, нюансы, на что обратить внимание"
+                                Text="{Binding DescriptionDraft}" />
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space3}">
+                                <Button
+                                    Command="{Binding SaveDescriptionCommand}"
+                                    Style="{StaticResource PrimaryButton}"
+                                    Text="Сохранить" />
+                                <Button
+                                    Grid.Column="1"
+                                    Command="{Binding CancelEditCommand}"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Text="Отмена" />
+                            </Grid>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <Grid
+                    ColumnDefinitions="*,*"
+                    ColumnSpacing="{StaticResource Space3}"
+                    RowDefinitions="Auto,Auto"
+                    RowSpacing="{StaticResource Space3}">
+                    <controls:StatTile Caption="Лучший подход" Value="{Binding BestSetText}" />
+                    <controls:StatTile
+                        Grid.Column="1"
+                        Caption="Оценка 1ПМ"
+                        Value="{Binding OneRepMaxText}" />
+                    <controls:StatTile
+                        Grid.Row="1"
+                        Caption="Лучший объём"
+                        Value="{Binding BestVolumeText}" />
+                    <controls:StatTile
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Caption="Тренировок"
+                        Value="{Binding SessionCountText}" />
+                </Grid>
+
+                <controls:SectionHeader IsVisible="{Binding HasSessions}" Title="Рабочий вес" />
+
+                <Border IsVisible="{Binding HasSessions}" Style="{StaticResource Card}">
+                    <controls:BarChartView ChartHeight="100" ItemsSource="{Binding WeightChart}" />
+                </Border>
+
+                <controls:SectionHeader IsVisible="{Binding HasSessions}" Title="Последние подходы" />
+
+                <Border IsVisible="{Binding HasSessions, Converter={StaticResource InvertedBool}}" Style="{StaticResource Card}">
+                    <Label
+                        Style="{StaticResource Muted}"
+                        Text="Это упражнение ещё ни разу не выполнялось" />
+                </Border>
+
+                <VerticalStackLayout
+                    BindableLayout.ItemsSource="{Binding Sessions}"
+                    Spacing="{StaticResource Space3}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="items:ExerciseSessionRowViewModel">
+                            <Border Style="{StaticResource Card}">
+                                <VerticalStackLayout Spacing="{StaticResource Space1}">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Style="{StaticResource Muted}" Text="{Binding DayText}" />
+                                        <Label
+                                            Grid.Column="1"
+                                            Style="{StaticResource Muted}"
+                                            Text="{Binding VolumeText}" />
+                                    </Grid>
+                                    <Label Text="{Binding SetsText}" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+
+</base:ContentPageBase>

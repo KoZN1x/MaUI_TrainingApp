@@ -33,7 +33,9 @@ namespace MauiTrainApp.DI
                 return services
                     .AddTransient<TodayViewModel>()
                     .AddTransient<TrainingPlansViewModel>()
-                    .AddTransient<WorkoutViewModel>();
+                    .AddTransient<WorkoutViewModel>()
+                    .AddTransient<ProgressViewModel>()
+                    .AddTransient<ExerciseDetailViewModel>();
             }
 
             private IServiceCollection AddPages()
