@@ -72,13 +72,21 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <Button
+        <VerticalStackLayout
             Grid.Row="2"
-            Margin="{StaticResource Space6}"
-            Command="{Binding RepeatCommand}"
-            IsVisible="{Binding CanRepeat}"
-            Style="{StaticResource PrimaryButton}"
-            Text="Повторить эту тренировку" />
+            Padding="{StaticResource Space6}"
+            IsVisible="{Binding IsLoaded}"
+            Spacing="{StaticResource Space3}">
+            <Button
+                Command="{Binding RepeatCommand}"
+                IsVisible="{Binding CanRepeat}"
+                Style="{StaticResource PrimaryButton}"
+                Text="Повторить эту тренировку" />
+            <Button
+                Command="{Binding DeleteCommand}"
+                Style="{StaticResource GhostButton}"
+                Text="Удалить тренировку" />
+        </VerticalStackLayout>
 
     </Grid>
 

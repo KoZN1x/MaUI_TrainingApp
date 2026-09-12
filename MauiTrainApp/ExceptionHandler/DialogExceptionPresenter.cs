@@ -6,8 +6,8 @@ namespace MauiTrainApp.ExceptionHandler
 {
     internal sealed class DialogExceptionPresenter : IExceptionPresenter
     {
-        private const string Title = "Error";
-        private const string Accept = "OK";
+        private const string Title = "Не получилось";
+        private const string Accept = "Понятно";
 
         public Task PresentAsync(AppException exception)
         {

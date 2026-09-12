@@ -21,7 +21,7 @@
         <RefreshView
             Grid.Row="1"
             Command="{Binding LoadCommand}"
-            IsRefreshing="{Binding IsBusy, Mode=OneWay}">
+            IsRefreshing="{Binding IsRefreshing, Mode=TwoWay}">
 
             <ScrollView>
                 <VerticalStackLayout Padding="{StaticResource Space6}" Spacing="{StaticResource Space6}">
@@ -86,33 +86,10 @@
                         </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>
 
-                    <controls:SectionHeader
-                        ActionCommand="{Binding OpenExercisesCommand}"
-                        ActionText="Все"
-                        Title="Упражнения" />
-
-                    <VerticalStackLayout
-                        BindableLayout.ItemsSource="{Binding Exercises}"
-                        Spacing="{StaticResource Space3}">
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate x:DataType="items:ExerciseRowViewModel">
-                                <Border Style="{StaticResource Card}">
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ProgressViewModel}}, Path=OpenExerciseCommand}"
-                                            CommandParameter="{Binding .}" />
-                                    </Border.GestureRecognizers>
-                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space3}">
-                                        <Label Text="{Binding Name}" VerticalOptions="Center" />
-                                        <controls:TagChip
-                                            Grid.Column="1"
-                                            Kind="Outline"
-                                            Text="{Binding MuscleName}" />
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </VerticalStackLayout>
+                    <Button
+                        Command="{Binding OpenExercisesCommand}"
+                        Style="{StaticResource SecondaryButton}"
+                        Text="Упражнения и рекорды" />
 
                 </VerticalStackLayout>
             </ScrollView>

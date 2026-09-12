@@ -18,7 +18,10 @@ namespace MauiTrainApp.Infrastructure.Mappers
         {
             var trainingPlan = new TrainingPlan(
                 record.Name,
-                record.ExerciseSets.Select(_exerciseSetRecordMapper.ToDomain))
+                record.ExerciseSets
+                    .OrderBy(x => x.CreatedAt)
+                    .ThenBy(x => x.Id)
+                    .Select(_exerciseSetRecordMapper.ToDomain))
             {
                 Id = record.Id,
                 CreatedAt = record.CreatedAt

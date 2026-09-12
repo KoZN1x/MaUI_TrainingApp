@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<base:ContentPageBase
+    x:Class="MauiTrainApp.Views.PlanEditorPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:base="clr-namespace:MauiTrainApp.Views.Base"
+    xmlns:controls="clr-namespace:MauiTrainApp.Controls"
+    xmlns:items="clr-namespace:MauiTrainApp.ViewModels.Items"
+    xmlns:viewModels="clr-namespace:MauiTrainApp.ViewModels"
+    x:DataType="viewModels:PlanEditorViewModel"
+    Title="План">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <ActivityIndicator
+            Grid.Row="0"
+            HeightRequest="3"
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="{StaticResource Space6}" Spacing="{StaticResource Space6}">
+
+                <VerticalStackLayout Spacing="{StaticResource Space3}">
+                    <Label Style="{StaticResource SectionCaption}" Text="Название" />
+                    <Entry Placeholder="Например, День ног" Text="{Binding Name}" />
+                    <Label Style="{StaticResource Muted}" Text="{Binding SummaryText}" />
+                </VerticalStackLayout>
+
+                <controls:SectionHeader
+                    ActionCommand="{Binding StartPickingCommand}"
+                    ActionText="+ Добавить"
+                    Title="Упражнения" />
+
+                <VerticalStackLayout
+                    BindableLayout.ItemsSource="{Binding Exercises}"
+                    Spacing="{StaticResource Space3}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="items:PlannedExerciseViewModel">
+                            <Border Style="{StaticResource Card}">
+                                <VerticalStackLayout Spacing="{StaticResource Space3}">
+
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space3}">
+                                        <Label
+                                            Style="{StaticResource CardTitle}"
+                                            Text="{Binding Name}"
+                                            VerticalOptions="Center" />
+                                        <Button
+                                            Grid.Column="1"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PlanEditorViewModel}}, Path=RemoveExerciseCommand}"
+                                            CommandParameter="{Binding .}"
+                                            Style="{StaticResource GhostButton}"
+                                            Text="Убрать" />
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*" ColumnSpacing="{StaticResource Space2}">
+                                        <Label
+                                            Grid.Column="0"
+                                            Style="{StaticResource Muted}"
+                                            Text="Подходы"
+                                            VerticalOptions="Center"
+                                            WidthRequest="66" />
+                                        <Button
+                                            Grid.Column="1"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PlanEditorViewModel}}, Path=DecreaseSetsCommand}"
+                                            CommandParameter="{Binding .}"
+                                            Style="{StaticResource StepButton}"
+                                            Text="−" />
+                                        <Label
+                                            Grid.Column="2"
+                                            HorizontalTextAlignment="Center"
+                                            Text="{Binding SetsText}"
+                                            VerticalOptions="Center"
+                                            WidthRequest="34" />
+                                        <Button
+                                            Grid.Column="3"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PlanEditorViewModel}}, Path=IncreaseSetsCommand}"
+                                            CommandParameter="{Binding .}"
+                                            Style="{StaticResource StepButton}"
+                                            Text="+" />
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*" ColumnSpacing="{StaticResource Space2}">
+                                        <Label
+                                            Grid.Column="0"
+                                            Style="{StaticResource Muted}"
+                                            Text="Повторы"
+                                            VerticalOptions="Center"
+                                            WidthRequest="66" />
+                                        <Button
+                                            Grid.Column="1"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PlanEditorViewModel}}, Path=DecreaseRepsCommand}"
+                                            CommandParameter="{Binding .}"
+                                            Style="{StaticResource StepButton}"
+                                            Text="−" />
+                                        <Label
+                                            Grid.Column="2"
+                                            HorizontalTextAlignment="Center"
+                                            Text="{Binding RepsText}"
+                                            VerticalOptions="Center"
+                                            WidthRequest="34" />
+                                        <Button
+                                            Grid.Column="3"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PlanEditorViewModel}}, Path=IncreaseRepsCommand}"
+                                            CommandParameter="{Binding .}"
+                                            Style="{StaticResource StepButton}"
+                                            Text="+" />
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*" ColumnSpacing="{StaticResource Space2}">
+                                        <Label
+                                            Grid.Column="0"
+                                            Style="{StaticResource Muted}"
+                                            Text="Вес, кг"
+                                            VerticalOptions="Center"
+                                            WidthRequest="66" />
+                                        <Button
+                                            Grid.Column="1"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PlanEditorViewModel}}, Path=DecreaseWeightCommand}"
+                                            CommandParameter="{Binding .}"
+                                            Style="{StaticResource StepButton}"
+                                            Text="−" />
+                                        <Label
+                                            Grid.Column="2"
+                                            HorizontalTextAlignment="Center"
+                                            Text="{Binding WeightText}"
+                                            VerticalOptions="Center"
+                                            WidthRequest="34" />
+                                        <Button
+                                            Grid.Column="3"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PlanEditorViewModel}}, Path=IncreaseWeightCommand}"
+                                            CommandParameter="{Binding .}"
+                                            Style="{StaticResource StepButton}"
+                                            Text="+" />
+                                    </Grid>
+
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <Border IsVisible="{Binding IsPicking}" Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="{StaticResource Space3}">
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Style="{StaticResource SectionCaption}" Text="Выберите упражнение" />
+                            <Button
+                                Grid.Column="1"
+                                Command="{Binding CancelPickingCommand}"
+                                Style="{StaticResource GhostButton}"
+                                Text="Закрыть" />
+                        </Grid>
+
+                        <VerticalStackLayout
+                            BindableLayout.ItemsSource="{Binding PickerExercises}"
+                            Spacing="{StaticResource Space2}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="items:ExerciseRowViewModel">
+                                    <Border
+                                        Padding="10,8"
+                                        BackgroundColor="{StaticResource BackgroundElevated}"
+                                        Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 8">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PlanEditorViewModel}}, Path=PickExerciseCommand}"
+                                                CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space3}">
+                                            <Label Text="{Binding Name}" VerticalOptions="Center" />
+                                            <controls:TagChip
+                                                Grid.Column="1"
+                                                Kind="Outline"
+                                                Text="{Binding MuscleName}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <VerticalStackLayout Grid.Row="2" Padding="{StaticResource Space6}" Spacing="{StaticResource Space3}">
+            <Button
+                Command="{Binding SaveCommand}"
+                Style="{StaticResource PrimaryButton}"
+                Text="{Binding SaveText}" />
+            <Button
+                Command="{Binding DeleteCommand}"
+                IsVisible="{Binding IsExisting}"
+                Style="{StaticResource GhostButton}"
+                Text="Удалить план" />
+        </VerticalStackLayout>
+
+    </Grid>
+
+</base:ContentPageBase>

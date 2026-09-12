@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<base:ContentPageBase
+    x:Class="MauiTrainApp.Views.ExercisesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:base="clr-namespace:MauiTrainApp.Views.Base"
+    xmlns:controls="clr-namespace:MauiTrainApp.Controls"
+    xmlns:items="clr-namespace:MauiTrainApp.ViewModels.Items"
+    xmlns:viewModels="clr-namespace:MauiTrainApp.ViewModels"
+    x:DataType="viewModels:ExercisesViewModel"
+    Title="Упражнения">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+        <ActivityIndicator
+            Grid.Row="0"
+            HeightRequest="3"
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}" />
+
+        <VerticalStackLayout Grid.Row="1" Padding="17,0" Spacing="{StaticResource Space3}">
+
+            <SearchBar Placeholder="Поиск упражнения" Text="{Binding SearchTerm}" />
+
+            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                <HorizontalStackLayout
+                    BindableLayout.ItemsSource="{Binding Filters}"
+                    Spacing="{StaticResource Space2}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="items:MuscleFilterViewModel">
+                            <controls:TagChip
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ExercisesViewModel}}, Path=SelectFilterCommand}"
+                                CommandParameter="{Binding .}"
+                                Kind="{Binding Kind}"
+                                Text="{Binding Name}" />
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </HorizontalStackLayout>
+            </ScrollView>
+
+        </VerticalStackLayout>
+
+        <Label
+            Grid.Row="2"
+            Margin="{StaticResource Space8}"
+            HorizontalTextAlignment="Center"
+            IsVisible="{Binding IsEmpty}"
+            Style="{StaticResource Muted}"
+            Text="Ничего не нашлось"
+            VerticalOptions="Center" />
+
+        <ScrollView Grid.Row="2">
+            <VerticalStackLayout
+                Padding="17,11"
+                BindableLayout.ItemsSource="{Binding Exercises}"
+                Spacing="{StaticResource Space3}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="items:ExerciseRowViewModel">
+                        <Border Style="{StaticResource Card}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ExercisesViewModel}}, Path=OpenExerciseCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space3}">
+                                <VerticalStackLayout Spacing="{StaticResource Space1}">
+                                    <Label Text="{Binding Name}" />
+                                    <Label Style="{StaticResource Muted}" Text="{Binding BestResultText}" />
+                                </VerticalStackLayout>
+                                <controls:TagChip
+                                    Grid.Column="1"
+                                    Kind="Outline"
+                                    Text="{Binding MuscleName}"
+                                    VerticalOptions="Center" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Button
+            Grid.Row="3"
+            Margin="{StaticResource Space6}"
+            Command="{Binding StartCreateCommand}"
+            IsVisible="{Binding IsCreating, Converter={StaticResource InvertedBool}}"
+            Style="{StaticResource PrimaryButton}"
+            Text="+ Своё упражнение" />
+
+        <Border
+            Grid.Row="3"
+            Margin="{StaticResource Space6}"
+            IsVisible="{Binding IsCreating}"
+            Style="{StaticResource Card}">
+            <VerticalStackLayout Spacing="{StaticResource Space3}">
+
+                <Label Style="{StaticResource SectionCaption}" Text="Своё упражнение" />
+
+                <Entry Placeholder="Название" Text="{Binding NewName}" />
+
+                <Picker
+                    ItemsSource="{Binding MuscleNames}"
+                    SelectedItem="{Binding NewMuscleName}"
+                    TextColor="{StaticResource TextPrimary}"
+                    Title="Группа мышц"
+                    TitleColor="{StaticResource Neutral600}" />
+
+                <Editor
+                    AutoSize="TextChanges"
+                    MinimumHeightRequest="70"
+                    Placeholder="Описание (необязательно)"
+                    Text="{Binding NewDescription}" />
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space3}">
+                    <Button
+                        Command="{Binding CreateExerciseCommand}"
+                        Style="{StaticResource PrimaryButton}"
+                        Text="Создать" />
+                    <Button
+                        Grid.Column="1"
+                        Command="{Binding CancelCreateCommand}"
+                        Style="{StaticResource SecondaryButton}"
+                        Text="Отмена" />
+                </Grid>
+
+            </VerticalStackLayout>
+        </Border>
+
+    </Grid>
+
+</base:ContentPageBase>

@@ -18,7 +18,10 @@ namespace MauiTrainApp.Infrastructure.Mappers
         {
             var workout = new Workout(
                 record.WorkoutDay,
-                record.ExerciseSets.Select(_exerciseSetRecordMapper.ToDomain),
+                record.ExerciseSets
+                    .OrderBy(x => x.CreatedAt)
+                    .ThenBy(x => x.Id)
+                    .Select(_exerciseSetRecordMapper.ToDomain),
                 record.TrainingPlanRecordId,
                 record.DurationSeconds is null ? null : TimeSpan.FromSeconds(record.DurationSeconds.Value),
                 record.StartedAt)

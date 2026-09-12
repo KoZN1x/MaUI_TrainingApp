@@ -161,7 +161,7 @@ namespace MauiTrainApp.ViewModels
             {
                 HeroKicker = "Тренировка идёт";
                 HeroTitle = active.TrainingPlanName ?? "Тренировка";
-                HeroSubtitle = $"{active.CompletedWorkingSetCount} из {RussianPlural.WorkingSets(active.TotalWorkingSetCount)}";
+                HeroSubtitle = $"Подходов: {active.CompletedWorkingSetCount} из {active.TotalWorkingSetCount}";
                 HeroActionText = "Продолжить тренировку";
 
                 return;

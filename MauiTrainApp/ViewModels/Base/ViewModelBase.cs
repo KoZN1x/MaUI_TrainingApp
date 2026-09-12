@@ -14,6 +14,9 @@ namespace MauiTrainApp.ViewModels.Base
         [ObservableProperty]
         private bool _isBusy;
 
+        [ObservableProperty]
+        private bool _isRefreshing;
+
         protected ViewModelBase(IServiceScopeFactory scopeFactory, IExceptionPresenter exceptionPresenter)
         {
             _scopeFactory = scopeFactory;
@@ -53,6 +56,7 @@ namespace MauiTrainApp.ViewModels.Base
             finally
             {
                 IsBusy = false;
+                IsRefreshing = false;
             }
         }
 

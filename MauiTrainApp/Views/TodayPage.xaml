@@ -21,7 +21,7 @@
         <RefreshView
             Grid.Row="1"
             Command="{Binding LoadCommand}"
-            IsRefreshing="{Binding IsBusy, Mode=OneWay}">
+            IsRefreshing="{Binding IsRefreshing, Mode=TwoWay}">
 
             <ScrollView>
                 <VerticalStackLayout Padding="{StaticResource Space6}" Spacing="{StaticResource Space6}">

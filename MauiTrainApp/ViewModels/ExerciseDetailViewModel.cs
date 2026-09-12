@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MauiTrainApp.Application.CQRS.Commands.DeleteExercise;
 using MauiTrainApp.Application.CQRS.Commands.UpdateExercise;
 using MauiTrainApp.Application.CQRS.Queries.GetExerciseProgress;
 using MauiTrainApp.Controls;
@@ -9,6 +10,8 @@ using MauiTrainApp.Domain.Enums;
 using MauiTrainApp.Domain.ReadModels;
 using MauiTrainApp.ExceptionHandler.Interfaces;
 using MauiTrainApp.Navigation;
+using MauiTrainApp.Navigation.Interfaces;
+using MauiTrainApp.Services.Interfaces;
 using MauiTrainApp.ViewModels.Base;
 using MauiTrainApp.ViewModels.Items;
 using Microsoft.Extensions.DependencyInjection;
@@ -67,9 +70,18 @@ namespace MauiTrainApp.ViewModels
         [ObservableProperty]
         private bool _hasSessions;
 
-        public ExerciseDetailViewModel(IServiceScopeFactory scopeFactory, IExceptionPresenter exceptionPresenter)
+        private readonly INavigator _navigator;
+        private readonly IDialogService _dialogs;
+
+        public ExerciseDetailViewModel(
+            IServiceScopeFactory scopeFactory,
+            IExceptionPresenter exceptionPresenter,
+            INavigator navigator,
+            IDialogService dialogs)
             : base(scopeFactory, exceptionPresenter)
         {
+            _navigator = navigator;
+            _dialogs = dialogs;
         }
 
         public ObservableCollection<ExerciseSessionRowViewModel> Sessions { get; } = [];
@@ -141,6 +153,27 @@ namespace MauiTrainApp.ViewModels
                 DescriptionDraft = Description;
                 HasDescription = description is not null;
                 IsEditing = false;
+            }, cancellationToken);
+        }
+
+        [RelayCommand]
+        private Task DeleteAsync(CancellationToken cancellationToken)
+        {
+            return RunAsync(async token =>
+            {
+                var confirmed = await _dialogs.ConfirmAsync(
+                    "Удалить упражнение?",
+                    $"«{Name}» исчезнет из каталога. Упражнение, входящее в план или проведённую тренировку, удалить нельзя.",
+                    "Удалить");
+
+                if (!confirmed)
+                {
+                    return;
+                }
+
+                await SendAsync(new DeleteExerciseCommand(_exerciseId), token);
+
+                await _navigator.GoBackAsync();
             }, cancellationToken);
         }
 

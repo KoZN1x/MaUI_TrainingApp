@@ -1,15 +1,16 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MauiTrainApp.Application.CQRS.Commands.DeleteWorkout;
 using MauiTrainApp.Application.CQRS.Commands.StartWorkoutFromPlan;
 using MauiTrainApp.Application.CQRS.Queries.GetWorkoutDetails;
 using MauiTrainApp.Controls;
 using MauiTrainApp.Converters;
 using MauiTrainApp.Domain.ReadModels;
 using MauiTrainApp.ExceptionHandler.Interfaces;
-using MauiTrainApp.Formatting;
 using MauiTrainApp.Navigation;
 using MauiTrainApp.Navigation.Interfaces;
+using MauiTrainApp.Services.Interfaces;
 using MauiTrainApp.ViewModels.Base;
 using MauiTrainApp.ViewModels.Items;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,7 @@ namespace MauiTrainApp.ViewModels
     public sealed partial class WorkoutDetailViewModel : ViewModelBase, IQueryAttributable
     {
         private readonly INavigator _navigator;
+        private readonly IDialogService _dialogs;
 
         private Guid _workoutId;
         private Guid? _trainingPlanId;
@@ -54,10 +56,12 @@ namespace MauiTrainApp.ViewModels
         public WorkoutDetailViewModel(
             IServiceScopeFactory scopeFactory,
             IExceptionPresenter exceptionPresenter,
-            INavigator navigator)
+            INavigator navigator,
+            IDialogService dialogs)
             : base(scopeFactory, exceptionPresenter)
         {
             _navigator = navigator;
+            _dialogs = dialogs;
         }
 
         public ObservableCollection<WorkoutDetailExerciseViewModel> Exercises { get; } = [];
@@ -121,6 +125,27 @@ namespace MauiTrainApp.ViewModels
             }, cancellationToken);
         }
 
+        [RelayCommand]
+        private Task DeleteAsync(CancellationToken cancellationToken)
+        {
+            return RunAsync(async token =>
+            {
+                var confirmed = await _dialogs.ConfirmAsync(
+                    "Удалить тренировку?",
+                    "Она исчезнет из истории и перестанет учитываться в прогрессе.",
+                    "Удалить");
+
+                if (!confirmed)
+                {
+                    return;
+                }
+
+                await SendAsync(new DeleteWorkoutCommand(_workoutId), token);
+
+                await _navigator.GoBackAsync();
+            }, cancellationToken);
+        }
+
         private void Apply(WorkoutDetailsReadModel workout)
         {
             _trainingPlanId = workout.TrainingPlanId;
@@ -136,7 +161,7 @@ namespace MauiTrainApp.ViewModels
 
             VolumeText = VolumeConverter.ToText(workout.TotalVolume);
             DurationText = DurationConverter.ToText(workout.Duration);
-            WorkingSetText = $"{completed} из {RussianPlural.WorkingSets(workingSets.Count)}";
+            WorkingSetText = $"Подходов: {completed} из {workingSets.Count}";
 
             CanRepeat = workout.TrainingPlanId is not null;
         }

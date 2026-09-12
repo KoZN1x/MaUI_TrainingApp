@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using MauiTrainApp.Domain.Enums;
 using MauiTrainApp.Infrastructure.Database.Seeding;
 using MauiTrainApp.Tests.Common;
 using Microsoft.EntityFrameworkCore;
@@ -89,6 +90,38 @@ public class DatabaseSeederTests : IDisposable
         Assert.Equal(7, stored!.ExerciseSets.Count);
         Assert.Equal(18, stored.ExerciseSets.Sum(x => x.WorkingSets.Count));
         Assert.StartsWith("Фуллбади · Воскресенье", stored.TrainingPlanName);
+    }
+
+    [Fact]
+    public async Task Seed_TagsEveryExerciseWithItsMuscleGroup()
+    {
+        await SeedAsync();
+
+        var exercises = await _database.ExerciseReader.GetAllAsync();
+
+        foreach (var seed in SeedCatalog.Exercises)
+        {
+            Assert.Equal(seed.MuscleGroup, exercises.Single(x => x.Name == seed.Name).MuscleGroup);
+        }
+    }
+
+    [Fact]
+    public async Task Seed_BackfillsMuscleGroupsOfExercisesStoredBeforeTheyExisted()
+    {
+        await SeedAsync();
+
+        await _database.Context.Exercises.ExecuteUpdateAsync(
+            x => x.SetProperty(exercise => exercise.MuscleGroup, MuscleGroup.Other));
+
+        _database.Context.ChangeTracker.Clear();
+
+        await SeedAsync();
+
+        var exercises = await _database.ExerciseReader.GetAllAsync();
+        var squat = exercises.Single(x => x.Name == SeedCatalog.SmithSquat);
+
+        Assert.Equal(MuscleGroup.Legs, squat.MuscleGroup);
+        Assert.Equal(SeedCatalog.Exercises.Count, exercises.Count);
     }
 
     private Task SeedAsync()

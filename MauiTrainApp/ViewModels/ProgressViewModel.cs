@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MauiTrainApp.Application.CQRS.Queries.GetExercises;
 using MauiTrainApp.Application.CQRS.Queries.GetProgressSummary;
 using MauiTrainApp.Controls;
 using MauiTrainApp.Converters;
@@ -60,8 +59,6 @@ namespace MauiTrainApp.ViewModels
 
         public ObservableCollection<MuscleShareViewModel> MuscleShares { get; } = [];
 
-        public ObservableCollection<ExerciseRowViewModel> Exercises { get; } = [];
-
         public override Task AppearingAsync(CancellationToken cancellationToken = default)
         {
             return LoadCommand.ExecuteAsync(null);
@@ -82,7 +79,6 @@ namespace MauiTrainApp.ViewModels
 
                 var summary = (await QueryAsync(new GetProgressSummaryQuery(periodStart, today), token)).Summary;
                 var chart = (await QueryAsync(new GetProgressSummaryQuery(chartStart, today), token)).Summary;
-                var exercises = await QueryAsync(new GetExercisesQuery(), token);
 
                 ApplyTiles(summary);
                 ApplyMuscleShares(summary);
@@ -93,21 +89,8 @@ namespace MauiTrainApp.ViewModels
                         ToBar(week, index == chart.WeeklyVolume.Count - 1))
                 ];
 
-                Exercises.Clear();
-
-                foreach (var exercise in exercises.Exercises)
-                {
-                    Exercises.Add(ExerciseRowViewModel.From(exercise));
-                }
-
                 HasData = summary.WorkoutCount > 0;
             }, cancellationToken);
-        }
-
-        [RelayCommand]
-        private Task OpenExerciseAsync(ExerciseRowViewModel exercise)
-        {
-            return _navigator.GoToExerciseDetailsAsync(exercise.Id);
         }
 
         [RelayCommand]

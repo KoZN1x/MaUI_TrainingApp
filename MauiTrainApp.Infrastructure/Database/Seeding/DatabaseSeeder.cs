@@ -1,4 +1,5 @@
 using MauiTrainApp.Domain.Entities;
+using MauiTrainApp.Domain.Enums;
 using MauiTrainApp.Domain.Interfaces;
 using MauiTrainApp.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,8 @@ namespace MauiTrainApp.Infrastructure.Database.Seeding
             if (await _dbContext.Exercises.AnyAsync(cancellationToken)
                 || await _dbContext.TrainingPlans.AnyAsync(cancellationToken))
             {
+                await BackfillMuscleGroupsAsync(cancellationToken);
+
                 return;
             }
 
@@ -38,6 +41,33 @@ namespace MauiTrainApp.Infrastructure.Database.Seeding
                     .ToList();
 
                 await _trainingPlans.AddAsync(new TrainingPlan(plan.Name, exerciseSets), cancellationToken);
+            }
+        }
+
+        private async Task BackfillMuscleGroupsAsync(CancellationToken cancellationToken)
+        {
+            var known = SeedCatalog.Exercises.ToDictionary(x => x.Name, x => x.MuscleGroup);
+
+            var untagged = await _dbContext.Exercises
+                .Where(x => x.MuscleGroup == MuscleGroup.Other)
+                .ToListAsync(cancellationToken);
+
+            var updated = false;
+
+            foreach (var record in untagged)
+            {
+                if (!known.TryGetValue(record.Name, out var muscleGroup) || muscleGroup == MuscleGroup.Other)
+                {
+                    continue;
+                }
+
+                _dbContext.Entry(record).Property(x => x.MuscleGroup).CurrentValue = muscleGroup;
+                updated = true;
+            }
+
+            if (updated)
+            {
+                await _dbContext.SaveChangesAsync(cancellationToken);
             }
         }
 

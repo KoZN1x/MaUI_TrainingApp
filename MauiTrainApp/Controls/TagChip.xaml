@@ -11,6 +11,11 @@
         HorizontalOptions="Start"
         StrokeShape="RoundRectangle 999"
         StrokeThickness="1">
+        <Border.GestureRecognizers>
+            <TapGestureRecognizer
+                Command="{Binding Command, Source={x:Reference Root}}"
+                CommandParameter="{Binding CommandParameter, Source={x:Reference Root}}" />
+        </Border.GestureRecognizers>
         <Label
             x:Name="ChipLabel"
             FontSize="11"

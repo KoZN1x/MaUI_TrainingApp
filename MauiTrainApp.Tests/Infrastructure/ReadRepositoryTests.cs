@@ -183,4 +183,37 @@ public class ReadRepositoryTests : IDisposable
 
         Assert.Null(await _database.WorkoutReader.GetActiveAsync(TestData.WorkoutDay.AddDays(1)));
     }
+
+    [Fact]
+    public async Task Exercises_CarryTheBestCompletedWorkingSet()
+    {
+        var squat = await _database.ExercisesWrite.AddAsync(TestData.NewExercise());
+
+        await _database.WorkoutsWrite.AddAsync(TestData.NewWorkout(TestData.NewExerciseSet(
+            squat,
+            TestData.NewWorkingSet(10, 80).Complete(),
+            TestData.NewWorkingSet(5, 120).Complete(),
+            TestData.NewWorkingSet(3, 140))));
+
+        var exercise = Assert.Single(await _database.ExerciseReader.GetAllAsync());
+
+        Assert.Equal(120, exercise.BestWeight);
+        Assert.Equal(5, exercise.BestWeightReps);
+        Assert.True(exercise.HasResult);
+    }
+
+    [Fact]
+    public async Task Exercises_HaveNoResultFromPlannedWorkingSetsAlone()
+    {
+        var squat = await _database.ExercisesWrite.AddAsync(TestData.NewExercise());
+
+        await _database.TrainingPlansWrite.AddAsync(TestData.NewTrainingPlan(
+            "Leg day",
+            TestData.NewExerciseSet(squat, TestData.NewWorkingSet(10, 200))));
+
+        var exercise = Assert.Single(await _database.ExerciseReader.GetAllAsync());
+
+        Assert.Equal(0, exercise.BestWeight);
+        Assert.False(exercise.HasResult);
+    }
 }

@@ -37,7 +37,7 @@
         <RefreshView
             Grid.Row="1"
             Command="{Binding LoadCommand}"
-            IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+            IsRefreshing="{Binding IsRefreshing, Mode=TwoWay}"
             IsVisible="{Binding IsEmpty, Converter={StaticResource InvertedBool}}">
 
             <ScrollView>

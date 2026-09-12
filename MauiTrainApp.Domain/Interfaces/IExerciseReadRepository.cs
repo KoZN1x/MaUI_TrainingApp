@@ -10,4 +10,6 @@ public interface IExerciseReadRepository : IReadRepository<ExerciseReadModel, Ex
         CancellationToken cancellationToken = default);
 
     Task<bool> ExistsWithNameAsync(string name, CancellationToken cancellationToken = default);
+
+    Task<bool> IsUsedAsync(Guid exerciseId, CancellationToken cancellationToken = default);
 }

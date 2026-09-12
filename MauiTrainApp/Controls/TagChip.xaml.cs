@@ -1,3 +1,4 @@
+using System.Windows.Input;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
 
@@ -7,6 +8,12 @@ namespace MauiTrainApp.Controls
     {
         public static readonly BindableProperty TextProperty =
             BindableProperty.Create(nameof(Text), typeof(string), typeof(TagChip), string.Empty);
+
+        public static readonly BindableProperty CommandProperty =
+            BindableProperty.Create(nameof(Command), typeof(ICommand), typeof(TagChip));
+
+        public static readonly BindableProperty CommandParameterProperty =
+            BindableProperty.Create(nameof(CommandParameter), typeof(object), typeof(TagChip));
 
         public static readonly BindableProperty KindProperty =
             BindableProperty.Create(nameof(Kind), typeof(TagChipKind), typeof(TagChip), TagChipKind.Neutral, propertyChanged: OnKindChanged);
@@ -22,6 +29,18 @@ namespace MauiTrainApp.Controls
         {
             get => (string)GetValue(TextProperty);
             set => SetValue(TextProperty, value);
+        }
+
+        public ICommand? Command
+        {
+            get => (ICommand?)GetValue(CommandProperty);
+            set => SetValue(CommandProperty, value);
+        }
+
+        public object? CommandParameter
+        {
+            get => GetValue(CommandParameterProperty);
+            set => SetValue(CommandParameterProperty, value);
         }
 
         public TagChipKind Kind
