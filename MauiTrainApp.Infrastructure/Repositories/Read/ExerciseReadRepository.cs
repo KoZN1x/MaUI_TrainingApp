@@ -48,7 +48,7 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
 
         private static IQueryable<ExerciseReadModel> Project(IQueryable<ExerciseRecord> query)
         {
-            return query.Select(x => new ExerciseReadModel(x.Id, x.Name, x.Description));
+            return query.Select(x => new ExerciseReadModel(x.Id, x.Name, x.Description, x.MuscleGroup));
         }
     }
 }

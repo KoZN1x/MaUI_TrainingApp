@@ -1,5 +1,6 @@
 using MauiTrainApp.Domain.Exceptions;
 using MauiTrainApp.ExceptionHandler.Interfaces;
+using Microsoft.Maui.ApplicationModel;
 
 namespace MauiTrainApp.ExceptionHandler
 {
@@ -18,7 +19,7 @@ namespace MauiTrainApp.ExceptionHandler
 
                 return page is null
                     ? Task.CompletedTask
-                    : page.DisplayAlert(Title, exception.UserMessage, Accept);
+                    : page.DisplayAlertAsync(Title, exception.UserMessage, Accept);
             });
         }
     }

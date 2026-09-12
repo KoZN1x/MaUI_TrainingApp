@@ -28,7 +28,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MauiTrainApp.Domain\MauiTrainApp.Domain.csproj" />
-    <ProjectReference Include="..\MauiTrainApp.Application\MauiTrainApp.Application.csproj" />
   </ItemGroup>
 
 </Project>

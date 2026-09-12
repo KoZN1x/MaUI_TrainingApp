@@ -10,6 +10,8 @@ namespace MauiTrainApp.Infrastructure.Records
 
         public TrainingPlanRecord? TrainingPlan { get; init; }
 
+        public int? DurationSeconds { get; init; }
+
         public ICollection<ExerciseSetRecord> ExerciseSets { get; init; } = [];
     }
 }

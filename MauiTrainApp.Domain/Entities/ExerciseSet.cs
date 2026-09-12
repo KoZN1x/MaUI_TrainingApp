@@ -28,6 +28,10 @@ namespace MauiTrainApp.Domain.Entities
 
         public bool IsCompleted => _workingSets.Count > 0 && _workingSets.All(x => x.IsCompleted);
 
+        public double CompletedVolume => _workingSets
+            .Where(x => x.IsCompleted)
+            .Sum(x => x.RepScheme.Reps * x.RepScheme.Weight);
+
         #endregion
 
         #region Methods
@@ -78,6 +82,13 @@ namespace MauiTrainApp.Domain.Entities
         public void CompleteWorkingSet(int index)
         {
             _workingSets[EnsureIndex(index)] = _workingSets[EnsureIndex(index)].Complete();
+
+            SetUpdatedTime();
+        }
+
+        public void ResetWorkingSet(int index)
+        {
+            _workingSets[EnsureIndex(index)] = _workingSets[EnsureIndex(index)].Reset();
 
             SetUpdatedTime();
         }

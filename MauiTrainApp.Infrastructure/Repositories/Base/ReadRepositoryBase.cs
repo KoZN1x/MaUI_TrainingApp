@@ -1,5 +1,4 @@
 using MauiTrainApp.Domain.Interfaces;
-using MauiTrainApp.Domain.Interfaces;
 using MauiTrainApp.Infrastructure.Database;
 using MauiTrainApp.Infrastructure.Records.Base;
 using Microsoft.EntityFrameworkCore;

@@ -1,14 +1,23 @@
+using MauiTrainApp.Application.CQRS.Commands.AddPerformedWorkingSet;
+using MauiTrainApp.Application.CQRS.Commands.AddPlannedExerciseSet;
 using MauiTrainApp.Application.CQRS.Commands.CompleteExerciseSet;
+using MauiTrainApp.Application.CQRS.Commands.CompleteWorkout;
 using MauiTrainApp.Application.CQRS.Commands.CompleteWorkingSet;
 using MauiTrainApp.Application.CQRS.Commands.CreateExercise;
 using MauiTrainApp.Application.CQRS.Commands.CreateTrainingPlan;
 using MauiTrainApp.Application.CQRS.Commands.DeleteExercise;
 using MauiTrainApp.Application.CQRS.Commands.DeleteTrainingPlan;
 using MauiTrainApp.Application.CQRS.Commands.DeleteWorkout;
+using MauiTrainApp.Application.CQRS.Commands.RemovePlannedExerciseSet;
+using MauiTrainApp.Application.CQRS.Commands.RenameTrainingPlan;
+using MauiTrainApp.Application.CQRS.Commands.ResetWorkingSet;
 using MauiTrainApp.Application.CQRS.Commands.StartWorkoutFromPlan;
 using MauiTrainApp.Application.CQRS.Commands.UpdatePerformedWorkingSet;
+using MauiTrainApp.Application.CQRS.Commands.UpdateExercise;
 using MauiTrainApp.Application.CQRS.Commands.UpdatePlannedExerciseSet;
+using MauiTrainApp.Application.CQRS.Queries.GetExerciseProgress;
 using MauiTrainApp.Application.CQRS.Queries.GetExercises;
+using MauiTrainApp.Application.CQRS.Queries.GetProgressSummary;
 using MauiTrainApp.Application.CQRS.Queries.GetTrainingPlanDetails;
 using MauiTrainApp.Application.CQRS.Queries.GetTrainingPlans;
 using MauiTrainApp.Application.CQRS.Queries.GetWorkoutDetails;
@@ -43,9 +52,16 @@ namespace MauiTrainApp.Application.DI
                     .AddCommand<StartWorkoutFromPlanCommand, StartWorkoutFromPlanResult, StartWorkoutFromPlanCommandHandler>()
                     .AddCommand<CompleteWorkingSetCommand, CompleteWorkingSetResult, CompleteWorkingSetCommandHandler>()
                     .AddCommand<CompleteExerciseSetCommand, CompleteExerciseSetResult, CompleteExerciseSetCommandHandler>()
+                    .AddCommand<ResetWorkingSetCommand, ResetWorkingSetResult, ResetWorkingSetCommandHandler>()
                     .AddCommand<DeleteWorkoutCommand, DeleteWorkoutResult, DeleteWorkoutCommandHandler>()
                     .AddCommand<UpdatePlannedExerciseSetCommand, UpdatePlannedExerciseSetResult, UpdatePlannedExerciseSetCommandHandler>()
-                    .AddCommand<UpdatePerformedWorkingSetCommand, UpdatePerformedWorkingSetResult, UpdatePerformedWorkingSetCommandHandler>();
+                    .AddCommand<UpdatePerformedWorkingSetCommand, UpdatePerformedWorkingSetResult, UpdatePerformedWorkingSetCommandHandler>()
+                    .AddCommand<UpdateExerciseCommand, UpdateExerciseResult, UpdateExerciseCommandHandler>()
+                    .AddCommand<CompleteWorkoutCommand, CompleteWorkoutResult, CompleteWorkoutCommandHandler>()
+                    .AddCommand<RenameTrainingPlanCommand, RenameTrainingPlanResult, RenameTrainingPlanCommandHandler>()
+                    .AddCommand<AddPlannedExerciseSetCommand, AddPlannedExerciseSetResult, AddPlannedExerciseSetCommandHandler>()
+                    .AddCommand<RemovePlannedExerciseSetCommand, RemovePlannedExerciseSetResult, RemovePlannedExerciseSetCommandHandler>()
+                    .AddCommand<AddPerformedWorkingSetCommand, AddPerformedWorkingSetResult, AddPerformedWorkingSetCommandHandler>();
             }
 
             private IServiceCollection AddQueries()
@@ -56,7 +72,9 @@ namespace MauiTrainApp.Application.DI
                     .AddQuery<GetTrainingPlanDetailsQuery, GetTrainingPlanDetailsResult, GetTrainingPlanDetailsQueryHandler>()
                     .AddQuery<GetWorkoutsQuery, GetWorkoutsResult, GetWorkoutsQueryHandler>()
                     .AddQuery<GetWorkoutsByPlanQuery, GetWorkoutsByPlanResult, GetWorkoutsByPlanQueryHandler>()
-                    .AddQuery<GetWorkoutDetailsQuery, GetWorkoutDetailsResult, GetWorkoutDetailsQueryHandler>();
+                    .AddQuery<GetWorkoutDetailsQuery, GetWorkoutDetailsResult, GetWorkoutDetailsQueryHandler>()
+                    .AddQuery<GetProgressSummaryQuery, GetProgressSummaryResult, GetProgressSummaryQueryHandler>()
+                    .AddQuery<GetExerciseProgressQuery, GetExerciseProgressResult, GetExerciseProgressQueryHandler>();
             }
         }
     }

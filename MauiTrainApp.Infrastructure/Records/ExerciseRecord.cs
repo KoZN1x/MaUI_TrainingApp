@@ -1,4 +1,5 @@
-﻿using MauiTrainApp.Infrastructure.Records.Base;
+using MauiTrainApp.Domain.Enums;
+using MauiTrainApp.Infrastructure.Records.Base;
 
 namespace MauiTrainApp.Infrastructure.Records
 {
@@ -6,5 +7,6 @@ namespace MauiTrainApp.Infrastructure.Records
     {
         public required string Name { get; init; }
         public string? Description { get; init; }
+        public MuscleGroup MuscleGroup { get; init; }
     }
 }

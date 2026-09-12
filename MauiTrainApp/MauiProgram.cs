@@ -1,10 +1,11 @@
 using MauiTrainApp.Application.DI;
 using MauiTrainApp.Core.ExceptionHandler;
-using MauiTrainApp.ExceptionHandler.Interfaces;
-using MauiTrainApp.ExceptionHandler;
+using MauiTrainApp.DI;
 using MauiTrainApp.Infrastructure.DI;
-using MauiTrainApp.Startup;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Controls.Hosting;
+using Microsoft.Maui.Hosting;
+using Microsoft.Maui.Storage;
 
 namespace MauiTrainApp
 {
@@ -26,8 +27,7 @@ namespace MauiTrainApp
             builder.Services
                 .AddInfrastructure(Path.Combine(FileSystem.AppDataDirectory, DatabaseFileName))
                 .AddApplication()
-                .AddSingleton<IExceptionPresenter, DialogExceptionPresenter>()
-                .AddSingleton<AppStartup>();
+                .AddClient();
 
 #if DEBUG
     		builder.Logging.AddDebug();

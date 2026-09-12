@@ -1,3 +1,7 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using MauiTrainApp.Application.CQRS.Commands.CompleteExerciseSet;
 using MauiTrainApp.Application.CQRS.Commands.CompleteWorkingSet;
 using MauiTrainApp.Application.CQRS.Commands.CreateExercise;
@@ -19,6 +23,7 @@ using MauiTrainApp.Domain.ReadModels;
 using MauiTrainApp.Infrastructure.DI;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
 namespace MauiTrainApp.Tests.Application;
 

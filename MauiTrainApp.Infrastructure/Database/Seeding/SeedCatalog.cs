@@ -1,3 +1,5 @@
+using MauiTrainApp.Domain.Enums;
+
 namespace MauiTrainApp.Infrastructure.Database.Seeding
 {
     internal static class SeedCatalog
@@ -26,23 +28,23 @@ namespace MauiTrainApp.Infrastructure.Database.Seeding
 
         public static IReadOnlyCollection<SeedExercise> Exercises { get; } =
         [
-            new(SmithSquat, Base),
-            new(DumbbellBenchPress, BaseDumbbell),
-            new(LatPulldown, Base),
-            new(ReverseGripPulldown, Base),
-            new(LateralRaise, Isolation),
-            new(RomanianDeadlift, "База. Отдых 2-3 мин. Техника важнее веса, вес не гнать."),
-            new(LegPress, Base),
-            new(InclineDumbbellPress, "База. Отдых 2-3 мин. Диапазон 6-8 повторов, прибавка +2,5 кг на руку."),
-            new(SeatedRow, Base),
-            new(SeatedShoulderPress, BaseDumbbell),
-            new(BarbellCurl, Isolation),
-            new(RearDeltFly, "Изоляция. Отдых 60-90 сек. Лёгкий вес, чистая техника."),
-            new(LyingLegCurl, Isolation),
-            new(TricepsRopePushdown, Isolation),
-            new(StandingCalfRaise, Isolation),
-            new(Crunches, Isolation),
-            new(ChestFly, Isolation)
+            new(SmithSquat, Base, MuscleGroup.Legs),
+            new(DumbbellBenchPress, BaseDumbbell, MuscleGroup.Chest),
+            new(LatPulldown, Base, MuscleGroup.Back),
+            new(ReverseGripPulldown, Base, MuscleGroup.Back),
+            new(LateralRaise, Isolation, MuscleGroup.Shoulders),
+            new(RomanianDeadlift, "База. Отдых 2-3 мин. Техника важнее веса, вес не гнать.", MuscleGroup.Legs),
+            new(LegPress, Base, MuscleGroup.Legs),
+            new(InclineDumbbellPress, "База. Отдых 2-3 мин. Диапазон 6-8 повторов, прибавка +2,5 кг на руку.", MuscleGroup.Chest),
+            new(SeatedRow, Base, MuscleGroup.Back),
+            new(SeatedShoulderPress, BaseDumbbell, MuscleGroup.Shoulders),
+            new(BarbellCurl, Isolation, MuscleGroup.Arms),
+            new(RearDeltFly, "Изоляция. Отдых 60-90 сек. Лёгкий вес, чистая техника.", MuscleGroup.Shoulders),
+            new(LyingLegCurl, Isolation, MuscleGroup.Legs),
+            new(TricepsRopePushdown, Isolation, MuscleGroup.Arms),
+            new(StandingCalfRaise, Isolation, MuscleGroup.Legs),
+            new(Crunches, Isolation, MuscleGroup.Core),
+            new(ChestFly, Isolation, MuscleGroup.Chest)
         ];
     }
 }

@@ -48,7 +48,7 @@ namespace MauiTrainApp.Infrastructure.Database.Seeding
             foreach (var seed in SeedCatalog.Exercises)
             {
                 var exercise = await _exercises.AddAsync(
-                    new Exercise(seed.Name, seed.Description),
+                    new Exercise(seed.Name, seed.Description, seed.MuscleGroup),
                     cancellationToken);
 
                 exercises.Add(seed.Name, exercise);

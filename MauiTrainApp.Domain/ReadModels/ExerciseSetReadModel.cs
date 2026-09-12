@@ -7,4 +7,6 @@ public sealed record ExerciseSetReadModel(
     IReadOnlyCollection<WorkingSetReadModel> WorkingSets)
 {
     public bool IsCompleted => WorkingSets.Count > 0 && WorkingSets.All(x => x.IsCompleted);
+
+    public double CompletedVolume => WorkingSets.Where(x => x.IsCompleted).Sum(x => x.Reps * x.Weight);
 }

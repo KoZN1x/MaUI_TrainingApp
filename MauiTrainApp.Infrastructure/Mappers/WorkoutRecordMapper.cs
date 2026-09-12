@@ -19,7 +19,8 @@ namespace MauiTrainApp.Infrastructure.Mappers
             var workout = new Workout(
                 record.WorkoutDay,
                 record.ExerciseSets.Select(_exerciseSetRecordMapper.ToDomain),
-                record.TrainingPlanRecordId)
+                record.TrainingPlanRecordId,
+                record.DurationSeconds is null ? null : TimeSpan.FromSeconds(record.DurationSeconds.Value))
             {
                 Id = record.Id,
                 CreatedAt = record.CreatedAt
@@ -44,6 +45,7 @@ namespace MauiTrainApp.Infrastructure.Mappers
                 UpdatedAt = entity.UpdatedAt,
                 WorkoutDay = entity.WorkoutDay,
                 TrainingPlanRecordId = entity.TrainingPlanId,
+                DurationSeconds = entity.Duration is null ? null : (int)entity.Duration.Value.TotalSeconds,
                 ExerciseSets = entity.ExerciseSets
                     .Select(x => _exerciseSetRecordMapper.ToRecord(x, parent))
                     .ToList()

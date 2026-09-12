@@ -29,6 +29,9 @@ namespace MauiTrainApp.Infrastructure.Database.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("MuscleGroup")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -107,6 +110,9 @@ namespace MauiTrainApp.Infrastructure.Database.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("DurationSeconds")
+                        .HasColumnType("INTEGER");
+
                     b.Property<Guid?>("TrainingPlanRecordId")
                         .HasColumnType("TEXT");
 
@@ -146,10 +152,12 @@ namespace MauiTrainApp.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("MauiTrainApp.Infrastructure.Records.WorkoutRecord", b =>
                 {
-                    b.HasOne("MauiTrainApp.Infrastructure.Records.TrainingPlanRecord", null)
+                    b.HasOne("MauiTrainApp.Infrastructure.Records.TrainingPlanRecord", "TrainingPlan")
                         .WithMany()
                         .HasForeignKey("TrainingPlanRecordId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("TrainingPlan");
                 });
 
             modelBuilder.Entity("MauiTrainApp.Infrastructure.Records.TrainingPlanRecord", b =>

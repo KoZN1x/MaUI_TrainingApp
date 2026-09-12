@@ -8,7 +8,7 @@ namespace MauiTrainApp.Infrastructure.Mappers
     {
         public Exercise ToDomain(ExerciseRecord record)
         {
-            var exercise = new Exercise(record.Name, record.Description)
+            var exercise = new Exercise(record.Name, record.Description, record.MuscleGroup)
             {
                 Id = record.Id,
                 CreatedAt = record.CreatedAt
@@ -31,6 +31,7 @@ namespace MauiTrainApp.Infrastructure.Mappers
                 UpdatedAt = entity.UpdatedAt,
                 Name = entity.Name,
                 Description = entity.Description,
+                MuscleGroup = entity.MuscleGroup,
             };
         }
     }

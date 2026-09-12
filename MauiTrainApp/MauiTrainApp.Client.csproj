@@ -18,6 +18,7 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<LangVersion>14.0</LangVersion>
 
 		<!-- Enable XAML source generation for faster build times and improved performance.
 		     This generates C# code from XAML at compile time instead of runtime inflation.
@@ -66,11 +67,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\MauiTrainApp.Core\MauiTrainApp.Core.csproj" />
+	  <ProjectReference Include="..\MauiTrainApp.Domain\MauiTrainApp.Domain.csproj" />
+	  <ProjectReference Include="..\MauiTrainApp.Application\MauiTrainApp.Application.csproj" />
 	  <ProjectReference Include="..\MauiTrainApp.Infrastructure\MauiTrainApp.Infrastructure.csproj" />
 	</ItemGroup>
 

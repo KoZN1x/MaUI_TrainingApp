@@ -6,7 +6,9 @@ public sealed record WorkoutListItemReadModel(
     Guid? TrainingPlanId,
     string? TrainingPlanName,
     int CompletedWorkingSetCount,
-    int TotalWorkingSetCount)
+    int TotalWorkingSetCount,
+    double TotalVolume,
+    TimeSpan? Duration)
 {
     public bool IsCompleted => TotalWorkingSetCount > 0 && CompletedWorkingSetCount == TotalWorkingSetCount;
 }

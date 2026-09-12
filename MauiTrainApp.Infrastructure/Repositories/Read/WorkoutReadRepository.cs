@@ -66,6 +66,7 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
                     x.Id,
                     x.WorkoutDay,
                     x.TrainingPlanRecordId,
+                    x.DurationSeconds,
                     TrainingPlanName = x.TrainingPlan!.Name,
                     WorkingSets = x.ExerciseSets.Select(exerciseSet => exerciseSet.WorkingSets).ToList()
                 })
@@ -78,7 +79,9 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
                     x.TrainingPlanRecordId,
                     x.TrainingPlanName,
                     x.WorkingSets.CountCompletedWorkingSets(),
-                    x.WorkingSets.CountWorkingSets()))
+                    x.WorkingSets.CountWorkingSets(),
+                    x.WorkingSets.SumCompletedVolume(),
+                    x.DurationSeconds is null ? null : TimeSpan.FromSeconds(x.DurationSeconds.Value)))
                 .ToList();
         }
 
@@ -92,6 +95,7 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
                     x.Id,
                     x.WorkoutDay,
                     x.TrainingPlanRecordId,
+                    x.DurationSeconds,
                     TrainingPlanName = x.TrainingPlan!.Name,
                     ExerciseSets = x.ExerciseSets
                         .Select(exerciseSet => new ExerciseSetRow(
@@ -110,7 +114,8 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
                     workout.WorkoutDay,
                     workout.TrainingPlanRecordId,
                     workout.TrainingPlanName,
-                    workout.ExerciseSets.ToReadModels());
+                    workout.ExerciseSets.ToReadModels(),
+                    workout.DurationSeconds is null ? null : TimeSpan.FromSeconds(workout.DurationSeconds.Value));
         }
     }
 }

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<base:ContentPageBase
+    x:Class="MauiTrainApp.Views.TrainingPlansPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:base="clr-namespace:MauiTrainApp.Views.Base"
+    xmlns:readModels="clr-namespace:MauiTrainApp.Domain.ReadModels;assembly=MauiTrainApp.Domain"
+    xmlns:viewModels="clr-namespace:MauiTrainApp.ViewModels"
+    x:DataType="viewModels:TrainingPlansViewModel"
+    Title="Планы">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <ActivityIndicator
+            Grid.Row="0"
+            HeightRequest="4"
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}" />
+
+        <Label
+            Grid.Row="1"
+            Margin="24"
+            HorizontalOptions="Center"
+            IsVisible="{Binding IsEmpty}"
+            Text="Планов пока нет"
+            VerticalOptions="Center" />
+
+        <RefreshView
+            Grid.Row="1"
+            Command="{Binding LoadCommand}"
+            IsRefreshing="{Binding IsBusy, Mode=OneWay}">
+
+            <CollectionView ItemsSource="{Binding TrainingPlans}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="readModels:TrainingPlanListItemReadModel">
+                        <Border Margin="16,8" Padding="16">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+
+                                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                    <Label FontAttributes="Bold" Text="{Binding Name}" />
+                                    <Label
+                                        FontSize="12"
+                                        Opacity="0.6"
+                                        Text="{Binding ExerciseSetCount, StringFormat='Упражнений: {0}'}" />
+                                </VerticalStackLayout>
+
+                                <Button
+                                    Grid.Column="1"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:TrainingPlansViewModel}}, Path=StartWorkoutCommand}"
+                                    CommandParameter="{Binding .}"
+                                    Text="Начать" />
+
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </RefreshView>
+
+    </Grid>
+
+</base:ContentPageBase>

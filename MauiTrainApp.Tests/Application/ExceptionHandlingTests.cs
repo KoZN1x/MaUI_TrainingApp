@@ -1,15 +1,19 @@
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using MauiTrainApp.Application.CQRS.Commands.CreateExercise;
 using MauiTrainApp.Application.CQRS.Commands.CreateTrainingPlan;
 using MauiTrainApp.Application.CQRS.Commands.DeleteWorkout;
 using MauiTrainApp.Application.CQRS.Commands.StartWorkoutFromPlan;
 using MauiTrainApp.Application.DI;
 using MauiTrainApp.Core.CQRS.Interfaces;
-using MauiTrainApp.Core.CQRS;
 using MauiTrainApp.Core.DI;
 using MauiTrainApp.Domain.Exceptions;
 using MauiTrainApp.Infrastructure.DI;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
 namespace MauiTrainApp.Tests.Application;
 

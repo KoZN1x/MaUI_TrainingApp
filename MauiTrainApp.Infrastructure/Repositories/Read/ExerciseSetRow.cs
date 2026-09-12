@@ -32,5 +32,10 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
 
         public static int CountCompletedWorkingSets(this IEnumerable<ICollection<WorkingSet>> workingSets) =>
             workingSets.Sum(x => x.Count(workingSet => workingSet.IsCompleted));
+
+        public static double SumCompletedVolume(this IEnumerable<ICollection<WorkingSet>> workingSets) =>
+            workingSets.Sum(x => x
+                .Where(workingSet => workingSet.IsCompleted)
+                .Sum(workingSet => workingSet.RepScheme.Reps * workingSet.RepScheme.Weight));
     }
 }

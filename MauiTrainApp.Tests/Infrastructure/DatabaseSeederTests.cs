@@ -1,6 +1,10 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using MauiTrainApp.Infrastructure.Database.Seeding;
 using MauiTrainApp.Tests.Common;
 using Microsoft.EntityFrameworkCore;
+using Xunit;
 
 namespace MauiTrainApp.Tests.Infrastructure;
 

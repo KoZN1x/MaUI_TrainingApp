@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<base:ContentPageBase
+    x:Class="MauiTrainApp.Views.WorkoutPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:base="clr-namespace:MauiTrainApp.Views.Base"
+    xmlns:items="clr-namespace:MauiTrainApp.ViewModels.Items"
+    xmlns:viewModels="clr-namespace:MauiTrainApp.ViewModels"
+    x:DataType="viewModels:WorkoutViewModel"
+    Title="{Binding Title}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <VerticalStackLayout Grid.Row="0" Padding="16,12" Spacing="8">
+            <Label FontSize="12" Opacity="0.6" Text="{Binding Subtitle}" />
+            <ProgressBar Progress="{Binding Progress}" />
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Exercises}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="items:WorkoutExerciseViewModel">
+                    <Border Margin="16,8" Padding="16">
+                        <VerticalStackLayout Spacing="12">
+
+                            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                                <Label
+                                    Grid.Column="0"
+                                    FontAttributes="Bold"
+                                    Text="{Binding ExerciseName}"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    Grid.Column="1"
+                                    Opacity="0.6"
+                                    Text="{Binding Progress}"
+                                    VerticalOptions="Center" />
+                                <Button
+                                    Grid.Column="2"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=CompleteExerciseCommand}"
+                                    CommandParameter="{Binding .}"
+                                    Text="Всё" />
+                            </Grid>
+
+                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding WorkingSets}" Spacing="8">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="items:WorkingSetViewModel">
+                                        <Grid ColumnDefinitions="Auto,*,*,Auto" ColumnSpacing="8">
+
+                                            <Label
+                                                Grid.Column="0"
+                                                Opacity="0.6"
+                                                Text="{Binding Number, StringFormat='#{0}'}"
+                                                VerticalOptions="Center"
+                                                WidthRequest="28" />
+
+                                            <Entry
+                                                Grid.Column="1"
+                                                Keyboard="Numeric"
+                                                Placeholder="повторы"
+                                                Text="{Binding Reps}"
+                                                Unfocused="OnWorkingSetUnfocused" />
+
+                                            <Entry
+                                                Grid.Column="2"
+                                                Keyboard="Numeric"
+                                                Placeholder="вес"
+                                                Text="{Binding Weight}"
+                                                Unfocused="OnWorkingSetUnfocused" />
+
+                                            <Button
+                                                Grid.Column="3"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=ToggleWorkingSetCommand}"
+                                                CommandParameter="{Binding .}"
+                                                Text="{Binding IsCompleted, Converter={StaticResource WorkingSetMark}}"
+                                                WidthRequest="48" />
+
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+
+</base:ContentPageBase>

@@ -1,4 +1,3 @@
-using MauiTrainApp.Domain.Interfaces;
 using MauiTrainApp.Domain.Entities;
 using MauiTrainApp.Domain.Interfaces;
 using MauiTrainApp.Infrastructure.Database;
@@ -55,7 +54,8 @@ namespace MauiTrainApp.Infrastructure.DI
                 return services
                     .AddScoped<IExerciseReadRepository, ExerciseReadRepository>()
                     .AddScoped<ITrainingPlanReadRepository, TrainingPlanReadRepository>()
-                    .AddScoped<IWorkoutReadRepository, WorkoutReadRepository>();
+                    .AddScoped<IWorkoutReadRepository, WorkoutReadRepository>()
+                    .AddScoped<IProgressReadRepository, ProgressReadRepository>();
             }
         }
     }

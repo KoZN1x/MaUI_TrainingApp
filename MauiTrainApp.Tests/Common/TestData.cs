@@ -1,3 +1,4 @@
+using System;
 using MauiTrainApp.Domain.Entities;
 using MauiTrainApp.Domain.ValueObjects;
 

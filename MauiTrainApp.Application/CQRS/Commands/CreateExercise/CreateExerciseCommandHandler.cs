@@ -23,7 +23,7 @@ internal sealed class CreateExerciseCommandHandler : ICommandHandler<CreateExerc
         CreateExerciseCommand command,
         CancellationToken cancellationToken = default)
     {
-        var exercise = new Exercise(command.Name, command.Description);
+        var exercise = new Exercise(command.Name, command.Description, command.MuscleGroup);
 
         if (await _exerciseReader.ExistsWithNameAsync(exercise.Name, cancellationToken))
         {

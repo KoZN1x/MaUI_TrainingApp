@@ -1,6 +1,12 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using MauiTrainApp.Application.CQRS.Commands.CompleteExerciseSet;
+using MauiTrainApp.Application.CQRS.Commands.CompleteWorkingSet;
 using MauiTrainApp.Application.CQRS.Commands.CreateExercise;
 using MauiTrainApp.Application.CQRS.Commands.CreateTrainingPlan;
+using MauiTrainApp.Application.CQRS.Commands.ResetWorkingSet;
 using MauiTrainApp.Application.CQRS.Commands.StartWorkoutFromPlan;
 using MauiTrainApp.Application.CQRS.Commands.UpdatePerformedWorkingSet;
 using MauiTrainApp.Application.CQRS.Commands.UpdatePlannedExerciseSet;
@@ -13,6 +19,7 @@ using MauiTrainApp.Domain.ReadModels;
 using MauiTrainApp.Infrastructure.DI;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
 namespace MauiTrainApp.Tests.Application;
 
@@ -149,6 +156,43 @@ public class ProgressionTests : IAsyncLifetime
         await Assert.ThrowsAsync<ValidationException>(
             () => sender.SendAsync(new UpdatePerformedWorkingSetCommand(
                 workout.WorkoutId, squat.Id, 7, Reps: 10, Weight: 65)));
+    }
+
+    [Fact]
+    public async Task ResetWorkingSet_UnchecksTheSetAndKeepsItsNumbers()
+    {
+        var sender = Sender();
+        var planId = await CreateSquatPlanAsync(sender);
+        var workout = await sender.SendAsync(new StartWorkoutFromPlanCommand(planId, new DateOnly(2026, 9, 10)));
+        var squat = await SingleExerciseSetAsync(sender, workout.WorkoutId);
+
+        await sender.SendAsync(new UpdatePerformedWorkingSetCommand(
+            workout.WorkoutId, squat.Id, 0, Reps: 8, Weight: 70));
+
+        await sender.SendAsync(new CompleteWorkingSetCommand(workout.WorkoutId, squat.Id, 0));
+
+        var completed = await SingleExerciseSetAsync(sender, workout.WorkoutId);
+        Assert.True(completed.WorkingSets.First().IsCompleted);
+
+        await sender.SendAsync(new ResetWorkingSetCommand(workout.WorkoutId, squat.Id, 0));
+
+        var reset = (await SingleExerciseSetAsync(sender, workout.WorkoutId)).WorkingSets.First();
+
+        Assert.False(reset.IsCompleted);
+        Assert.Equal(8, reset.Reps);
+        Assert.Equal(70, reset.Weight);
+    }
+
+    [Fact]
+    public async Task ResetWorkingSet_RejectsIndexOutOfRange()
+    {
+        var sender = Sender();
+        var planId = await CreateSquatPlanAsync(sender);
+        var workout = await sender.SendAsync(new StartWorkoutFromPlanCommand(planId, new DateOnly(2026, 9, 10)));
+        var squat = await SingleExerciseSetAsync(sender, workout.WorkoutId);
+
+        await Assert.ThrowsAsync<ValidationException>(
+            () => sender.SendAsync(new ResetWorkingSetCommand(workout.WorkoutId, squat.Id, 9)));
     }
 
     private static async Task<Guid> CreateSquatPlanAsync(ISender sender)

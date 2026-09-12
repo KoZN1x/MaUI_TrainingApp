@@ -1,6 +1,9 @@
+using System;
+using System.Linq;
 using MauiTrainApp.Domain.Entities;
 using MauiTrainApp.Domain.Exceptions;
 using MauiTrainApp.Tests.Common;
+using Xunit;
 
 namespace MauiTrainApp.Tests.Domain;
 
