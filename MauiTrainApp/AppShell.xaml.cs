@@ -15,7 +15,6 @@ namespace MauiTrainApp
             Routing.RegisterRoute(AppRoutes.PlanEditor, typeof(PlanEditorPage));
             Routing.RegisterRoute(AppRoutes.Exercises, typeof(ExercisesPage));
             Routing.RegisterRoute(AppRoutes.ExerciseDetails, typeof(ExerciseDetailPage));
-            Routing.RegisterRoute(AppRoutes.Progress, typeof(ProgressPage));
         }
     }
 }

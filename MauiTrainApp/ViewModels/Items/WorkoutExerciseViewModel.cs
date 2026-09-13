@@ -25,6 +25,7 @@ namespace MauiTrainApp.ViewModels.Items
         {
             Id = exerciseSet.Id;
             Number = number;
+            ExerciseId = exerciseSet.ExerciseId;
             ExerciseName = exerciseSet.ExerciseName;
 
             WorkingSets = [.. exerciseSet.WorkingSets.Select((x, index) => new WorkingSetViewModel(Id, index, x))];
@@ -41,6 +42,8 @@ namespace MauiTrainApp.ViewModels.Items
 
         public int Number { get; }
 
+        public Guid ExerciseId { get; }
+
         public string ExerciseName { get; }
 
         public ObservableCollection<WorkingSetViewModel> WorkingSets { get; }
@@ -52,6 +55,18 @@ namespace MauiTrainApp.ViewModels.Items
             workingSet.PropertyChanged += (_, _) => Refresh();
 
             WorkingSets.Add(workingSet);
+
+            Refresh();
+        }
+
+        public void Remove(WorkingSetViewModel workingSet)
+        {
+            WorkingSets.Remove(workingSet);
+
+            for (var index = 0; index < WorkingSets.Count; index++)
+            {
+                WorkingSets[index].Index = index;
+            }
 
             Refresh();
         }

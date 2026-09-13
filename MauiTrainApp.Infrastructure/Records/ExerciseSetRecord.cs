@@ -9,6 +9,8 @@ namespace MauiTrainApp.Infrastructure.Records
         public Guid? TrainingPlanRecordId { get; init; }
         public Guid ExerciseRecordId { get; init; }
 
+        public int Position { get; init; }
+
         public ExerciseRecord Exercise { get; init; } = null!;
 
         public ICollection<WorkingSet> WorkingSets { get; init; } = [];

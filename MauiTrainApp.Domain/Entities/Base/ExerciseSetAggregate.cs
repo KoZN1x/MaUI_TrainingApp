@@ -63,6 +63,28 @@ namespace MauiTrainApp.Domain.Entities.Base
             SetUpdatedTime();
         }
 
+        public void MoveExerciseSet(Guid exerciseSetId, int newIndex)
+        {
+            if (newIndex < 0 || newIndex >= _exerciseSets.Count)
+            {
+                throw new InvariantException($"Exercise set index {newIndex} is out of range");
+            }
+
+            var index = IndexOf(exerciseSetId);
+
+            if (index == newIndex)
+            {
+                return;
+            }
+
+            var exerciseSet = _exerciseSets[index];
+
+            _exerciseSets.RemoveAt(index);
+            _exerciseSets.Insert(newIndex, exerciseSet);
+
+            SetUpdatedTime();
+        }
+
         public void ReplaceExerciseSets(IEnumerable<ExerciseSet> exerciseSets)
         {
             ArgumentNullException.ThrowIfNull(exerciseSets);

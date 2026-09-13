@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using MauiTrainApp.Application.CQRS.Commands.AddPlannedExerciseSet;
 using MauiTrainApp.Application.CQRS.Commands.CreateTrainingPlan;
 using MauiTrainApp.Application.CQRS.Commands.DeleteTrainingPlan;
+using MauiTrainApp.Application.CQRS.Commands.MovePlannedExerciseSet;
 using MauiTrainApp.Application.CQRS.Commands.RemovePlannedExerciseSet;
 using MauiTrainApp.Application.CQRS.Commands.RenameTrainingPlan;
 using MauiTrainApp.Application.CQRS.Commands.SetTrainingPlanSchedule;
@@ -238,6 +239,14 @@ namespace MauiTrainApp.ViewModels
             ChangeAsync(exercise, setsDelta: 0, repsDelta: 0, -_settings.WeightStep, cancellationToken);
 
         [RelayCommand]
+        private Task MoveExerciseUpAsync(PlannedExerciseViewModel exercise, CancellationToken cancellationToken) =>
+            MoveAsync(exercise, -1, cancellationToken);
+
+        [RelayCommand]
+        private Task MoveExerciseDownAsync(PlannedExerciseViewModel exercise, CancellationToken cancellationToken) =>
+            MoveAsync(exercise, 1, cancellationToken);
+
+        [RelayCommand]
         private Task ToggleScheduleDayAsync(ScheduleDayViewModel day, CancellationToken cancellationToken)
         {
             return RunAsync(async token =>
@@ -404,6 +413,42 @@ namespace MauiTrainApp.ViewModels
             return true;
         }
 
+        private Task MoveAsync(
+            PlannedExerciseViewModel exercise,
+            int offset,
+            CancellationToken cancellationToken)
+        {
+            return RunAsync(async token =>
+            {
+                var index = Exercises.IndexOf(exercise);
+                var newIndex = index + offset;
+
+                if (index < 0 || newIndex < 0 || newIndex >= Exercises.Count)
+                {
+                    return;
+                }
+
+                if (_trainingPlanId is { } trainingPlanId && exercise.ExerciseSetId is { } exerciseSetId)
+                {
+                    await SendAsync(
+                        new MovePlannedExerciseSetCommand(trainingPlanId, exerciseSetId, newIndex),
+                        token);
+                }
+
+                Exercises.Move(index, newIndex);
+
+                RefreshOrder();
+            }, cancellationToken);
+        }
+
+        private void RefreshOrder()
+        {
+            for (var index = 0; index < Exercises.Count; index++)
+            {
+                Exercises[index].SetOrder(index, Exercises.Count);
+            }
+        }
+
         private void ApplySchedule(WeekSchedule schedule)
         {
             Schedule.Clear();
@@ -428,6 +473,8 @@ namespace MauiTrainApp.ViewModels
 
         private void Refresh()
         {
+            RefreshOrder();
+
             IsEmpty = Exercises.Count == 0;
 
             SummaryText = IsEmpty

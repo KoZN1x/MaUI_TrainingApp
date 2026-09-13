@@ -94,5 +94,11 @@ namespace MauiTrainApp.ViewModels
         {
             return _navigator.GoToPlanEditorAsync();
         }
+
+        [RelayCommand]
+        private Task OpenExercisesAsync()
+        {
+            return _navigator.GoToExercisesAsync();
+        }
     }
 }

@@ -21,10 +21,14 @@ namespace MauiTrainApp.ViewModels.Items
         [ObservableProperty]
         private string _weightText;
 
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(Number))]
+        private int _index;
+
         public WorkingSetViewModel(Guid exerciseSetId, int index, WorkingSetReadModel workingSet)
         {
             ExerciseSetId = exerciseSetId;
-            Index = index;
+            _index = index;
             _reps = workingSet.Reps;
             _weight = workingSet.Weight;
             _isCompleted = workingSet.IsCompleted;
@@ -33,8 +37,6 @@ namespace MauiTrainApp.ViewModels.Items
         }
 
         public Guid ExerciseSetId { get; }
-
-        public int Index { get; }
 
         public int Number => Index + 1;
 

@@ -1,3 +1,4 @@
+using MauiTrainApp.Application.CQRS.Commands.AddPerformedExerciseSet;
 using MauiTrainApp.Application.CQRS.Commands.AddPerformedWorkingSet;
 using MauiTrainApp.Application.CQRS.Commands.AddPlannedExerciseSet;
 using MauiTrainApp.Application.CQRS.Commands.CompleteExerciseSet;
@@ -8,6 +9,8 @@ using MauiTrainApp.Application.CQRS.Commands.CreateTrainingPlan;
 using MauiTrainApp.Application.CQRS.Commands.DeleteExercise;
 using MauiTrainApp.Application.CQRS.Commands.DeleteTrainingPlan;
 using MauiTrainApp.Application.CQRS.Commands.DeleteWorkout;
+using MauiTrainApp.Application.CQRS.Commands.MovePlannedExerciseSet;
+using MauiTrainApp.Application.CQRS.Commands.RemovePerformedWorkingSet;
 using MauiTrainApp.Application.CQRS.Commands.RemovePlannedExerciseSet;
 using MauiTrainApp.Application.CQRS.Commands.RenameTrainingPlan;
 using MauiTrainApp.Application.CQRS.Commands.SetTrainingPlanSchedule;
@@ -65,7 +68,10 @@ namespace MauiTrainApp.Application.DI
                     .AddCommand<SetTrainingPlanScheduleCommand, SetTrainingPlanScheduleResult, SetTrainingPlanScheduleCommandHandler>()
                     .AddCommand<AddPlannedExerciseSetCommand, AddPlannedExerciseSetResult, AddPlannedExerciseSetCommandHandler>()
                     .AddCommand<RemovePlannedExerciseSetCommand, RemovePlannedExerciseSetResult, RemovePlannedExerciseSetCommandHandler>()
-                    .AddCommand<AddPerformedWorkingSetCommand, AddPerformedWorkingSetResult, AddPerformedWorkingSetCommandHandler>();
+                    .AddCommand<AddPerformedWorkingSetCommand, AddPerformedWorkingSetResult, AddPerformedWorkingSetCommandHandler>()
+                    .AddCommand<AddPerformedExerciseSetCommand, AddPerformedExerciseSetResult, AddPerformedExerciseSetCommandHandler>()
+                    .AddCommand<RemovePerformedWorkingSetCommand, RemovePerformedWorkingSetResult, RemovePerformedWorkingSetCommandHandler>()
+                    .AddCommand<MovePlannedExerciseSetCommand, MovePlannedExerciseSetResult, MovePlannedExerciseSetCommandHandler>();
             }
 
             private IServiceCollection AddQueries()

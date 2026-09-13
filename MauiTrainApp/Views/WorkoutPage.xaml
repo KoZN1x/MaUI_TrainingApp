@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:base="clr-namespace:MauiTrainApp.Views.Base"
+    xmlns:controls="clr-namespace:MauiTrainApp.Controls"
     xmlns:items="clr-namespace:MauiTrainApp.ViewModels.Items"
     xmlns:viewModels="clr-namespace:MauiTrainApp.ViewModels"
     x:DataType="viewModels:WorkoutViewModel"
@@ -36,9 +37,11 @@
             </VerticalStackLayout>
         </Border>
 
-        <ScrollView Grid.Row="1">
+        <ScrollView Grid.Row="1" x:Name="ExercisesScroll">
+            <VerticalStackLayout Padding="17,0" Spacing="{StaticResource Space3}">
+
             <VerticalStackLayout
-                Padding="17,0"
+                x:Name="ExercisesLayout"
                 BindableLayout.ItemsSource="{Binding Exercises}"
                 Spacing="{StaticResource Space3}">
                 <BindableLayout.ItemTemplate>
@@ -83,7 +86,7 @@
                                 </Grid>
 
                                 <Grid
-                                    ColumnDefinitions="Auto,Auto,*,Auto,Auto,*,Auto,Auto"
+                                    ColumnDefinitions="Auto,Auto,*,Auto,Auto,*,Auto,Auto,Auto"
                                     ColumnSpacing="4"
                                     IsVisible="{Binding IsExpanded}">
                                     <Label
@@ -106,14 +109,15 @@
                                     Spacing="{StaticResource Space3}">
                                     <BindableLayout.ItemTemplate>
                                         <DataTemplate x:DataType="items:WorkingSetViewModel">
-                                            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,*,Auto,Auto" ColumnSpacing="4">
+                                            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="4">
 
                                                 <Label
                                                     Grid.Column="0"
                                                     Style="{StaticResource Muted}"
-                                                    Text="{Binding Number, StringFormat='#{0}'}"
+                                                    HorizontalTextAlignment="Center"
+                                                    Text="{Binding Number}"
                                                     VerticalOptions="Center"
-                                                    WidthRequest="20" />
+                                                    WidthRequest="14" />
 
                                                 <Button
                                                     Grid.Column="1"
@@ -121,7 +125,7 @@
                                                     CommandParameter="{Binding .}"
                                                     Style="{StaticResource StepButtonSmall}"
                                                     Text="−" />
-                                                <Entry
+                                                <controls:NumericEntry
                                                     Grid.Column="2"
                                                     Completed="OnWorkingSetEntryCompleted"
                                                     Style="{StaticResource NumberEntry}"
@@ -140,7 +144,7 @@
                                                     CommandParameter="{Binding .}"
                                                     Style="{StaticResource StepButtonSmall}"
                                                     Text="−" />
-                                                <Entry
+                                                <controls:NumericEntry
                                                     Grid.Column="5"
                                                     Completed="OnWorkingSetEntryCompleted"
                                                     Style="{StaticResource NumberEntry}"
@@ -160,6 +164,13 @@
                                                     Style="{StaticResource StepButtonSmall}"
                                                     Text="{Binding IsCompleted, Converter={StaticResource WorkingSetMark}}" />
 
+                                                <Button
+                                                    Grid.Column="8"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=RemoveWorkingSetCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    Style="{StaticResource DeleteButton}"
+                                                    Text="🗑" />
+
                                             </Grid>
                                         </DataTemplate>
                                     </BindableLayout.ItemTemplate>
@@ -176,6 +187,56 @@
                         </Border>
                     </DataTemplate>
                 </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+
+                <Button
+                    Command="{Binding StartPickingCommand}"
+                    IsVisible="{Binding IsLoaded}"
+                    Style="{StaticResource SecondaryButton}"
+                    Text="+ Упражнение" />
+
+                <Border IsVisible="{Binding IsPicking}" Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="{StaticResource Space3}">
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Style="{StaticResource SectionCaption}" Text="Выберите упражнение" />
+                            <Button
+                                Grid.Column="1"
+                                Command="{Binding CancelPickingCommand}"
+                                Style="{StaticResource GhostButton}"
+                                Text="Закрыть" />
+                        </Grid>
+
+                        <VerticalStackLayout
+                            BindableLayout.ItemsSource="{Binding PickerExercises}"
+                            Spacing="{StaticResource Space2}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="items:ExerciseRowViewModel">
+                                    <Border
+                                        Padding="10,8"
+                                        BackgroundColor="{StaticResource BackgroundElevated}"
+                                        Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 8">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WorkoutViewModel}}, Path=PickExerciseCommand}"
+                                                CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space3}">
+                                            <Label Text="{Binding Name}" VerticalOptions="Center" />
+                                            <controls:TagChip
+                                                Grid.Column="1"
+                                                Kind="Outline"
+                                                Text="{Binding MuscleName}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+                </Border>
+
             </VerticalStackLayout>
         </ScrollView>
 

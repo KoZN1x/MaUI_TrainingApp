@@ -24,6 +24,15 @@ namespace MauiTrainApp.ViewModels.Items
         [ObservableProperty]
         private string _weightText;
 
+        [ObservableProperty]
+        private int _number;
+
+        [ObservableProperty]
+        private bool _canMoveUp;
+
+        [ObservableProperty]
+        private bool _canMoveDown;
+
         public PlannedExerciseViewModel(Guid exerciseId, string name, Guid? exerciseSetId, int sets, byte reps, double weight)
         {
             ExerciseId = exerciseId;
@@ -54,6 +63,13 @@ namespace MauiTrainApp.ViewModels.Items
                 exerciseSet.WorkingSets.Count,
                 first?.Reps ?? 10,
                 first?.Weight ?? 20);
+        }
+
+        public void SetOrder(int index, int count)
+        {
+            Number = index + 1;
+            CanMoveUp = index > 0;
+            CanMoveDown = index < count - 1;
         }
 
         public void Apply(int sets, byte reps, double weight)

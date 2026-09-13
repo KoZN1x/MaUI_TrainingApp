@@ -20,7 +20,8 @@ namespace MauiTrainApp.Infrastructure.Mappers
             var trainingPlan = new TrainingPlan(
                 record.Name,
                 record.ExerciseSets
-                    .OrderBy(x => x.CreatedAt)
+                    .OrderBy(x => x.Position)
+                    .ThenBy(x => x.CreatedAt)
                     .ThenBy(x => x.Id)
                     .Select(_exerciseSetRecordMapper.ToDomain),
                 WeekSchedule.FromMask(record.ScheduleMask))
@@ -49,7 +50,7 @@ namespace MauiTrainApp.Infrastructure.Mappers
                 Name = entity.Name,
                 ScheduleMask = entity.Schedule.Mask,
                 ExerciseSets = entity.ExerciseSets
-                    .Select(x => _exerciseSetRecordMapper.ToRecord(x, parent))
+                    .Select((x, index) => _exerciseSetRecordMapper.ToRecord(x, parent) with { Position = index })
                     .ToList()
             };
         }

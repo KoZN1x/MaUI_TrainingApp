@@ -1,13 +1,16 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MauiTrainApp.Application.CQRS.Commands.AddPerformedExerciseSet;
 using MauiTrainApp.Application.CQRS.Commands.AddPerformedWorkingSet;
 using MauiTrainApp.Application.CQRS.Commands.CompleteExerciseSet;
 using MauiTrainApp.Application.CQRS.Commands.CompleteWorkingSet;
 using MauiTrainApp.Application.CQRS.Commands.CompleteWorkout;
 using MauiTrainApp.Application.CQRS.Commands.DeleteWorkout;
+using MauiTrainApp.Application.CQRS.Commands.RemovePerformedWorkingSet;
 using MauiTrainApp.Application.CQRS.Commands.ResetWorkingSet;
 using MauiTrainApp.Application.CQRS.Commands.UpdatePerformedWorkingSet;
+using MauiTrainApp.Application.CQRS.Queries.GetExercises;
 using MauiTrainApp.Application.CQRS.Queries.GetWorkoutDetails;
 using MauiTrainApp.Converters;
 using MauiTrainApp.Formatting;
@@ -28,6 +31,9 @@ namespace MauiTrainApp.ViewModels
         private const byte MinimumReps = 1;
         private const byte MaximumReps = 100;
         private const double MaximumWeight = 1000;
+        private const int AddedSets = 3;
+        private const byte AddedReps = 10;
+        private const double AddedWeight = 0;
 
         private readonly INavigator _navigator;
         private readonly IDialogService _dialogs;
@@ -63,6 +69,9 @@ namespace MauiTrainApp.ViewModels
         [ObservableProperty]
         private bool _isLoaded;
 
+        [ObservableProperty]
+        private bool _isPicking;
+
         public WorkoutViewModel(
             IServiceScopeFactory scopeFactory,
             IExceptionPresenter exceptionPresenter,
@@ -79,7 +88,11 @@ namespace MauiTrainApp.ViewModels
             _clock.Ticked += OnClockTicked;
         }
 
+        public event EventHandler<WorkoutExerciseViewModel>? ExerciseExpanded;
+
         public ObservableCollection<WorkoutExerciseViewModel> Exercises { get; } = [];
+
+        public ObservableCollection<ExerciseRowViewModel> PickerExercises { get; } = [];
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
@@ -104,51 +117,143 @@ namespace MauiTrainApp.ViewModels
         [RelayCommand]
         private Task LoadAsync(CancellationToken cancellationToken)
         {
-            return RunAsync(async token =>
+            return RunAsync(token => LoadCoreAsync(null, token), cancellationToken);
+        }
+
+        private async Task LoadCoreAsync(Guid? expandExerciseSetId, CancellationToken cancellationToken)
+        {
+            var result = await QueryAsync(new GetWorkoutDetailsQuery(_workoutId), cancellationToken);
+
+            Exercises.Clear();
+
+            if (result.Workout is null)
             {
-                var result = await QueryAsync(new GetWorkoutDetailsQuery(_workoutId), token);
+                IsLoaded = false;
 
-                Exercises.Clear();
+                return;
+            }
 
-                if (result.Workout is null)
-                {
-                    IsLoaded = false;
+            var number = 1;
 
-                    return;
-                }
+            foreach (var exerciseSet in result.Workout.ExerciseSets)
+            {
+                var exercise = new WorkoutExerciseViewModel(exerciseSet, number++);
 
-                var number = 1;
+                exercise.IsExpanded = expandExerciseSetId is { } expandId
+                    ? exercise.Id == expandId
+                    : !exercise.IsCompleted && Exercises.All(x => !x.IsExpanded);
 
-                foreach (var exerciseSet in result.Workout.ExerciseSets)
-                {
-                    var exercise = new WorkoutExerciseViewModel(exerciseSet, number++);
+                Exercises.Add(exercise);
+            }
 
-                    exercise.IsExpanded = !exercise.IsCompleted && Exercises.All(x => !x.IsExpanded);
+            Title = result.Workout.TrainingPlanName ?? "Тренировка";
+            DayText = WorkoutDayConverter.ToText(result.Workout.WorkoutDay);
+            IsLoaded = true;
 
-                    Exercises.Add(exercise);
-                }
+            Refresh();
 
-                Title = result.Workout.TrainingPlanName ?? "Тренировка";
-                DayText = WorkoutDayConverter.ToText(result.Workout.WorkoutDay);
-                IsLoaded = true;
+            var elapsed = result.Workout.Duration ?? Since(result.Workout.StartedAt);
 
-                Refresh();
+            OnClockTicked(this, elapsed);
 
-                var elapsed = result.Workout.Duration ?? Since(result.Workout.StartedAt);
-
-                OnClockTicked(this, elapsed);
-
-                if (result.Workout.Duration is null)
-                {
-                    await MainThread.InvokeOnMainThreadAsync(() => _clock.Start(elapsed));
-                }
-            }, cancellationToken);
+            if (result.Workout.Duration is null)
+            {
+                await MainThread.InvokeOnMainThreadAsync(() => _clock.Start(elapsed));
+            }
         }
 
         [RelayCommand]
         private void ToggleExercise(WorkoutExerciseViewModel exercise)
         {
-            exercise.IsExpanded = !exercise.IsExpanded;
+            var expand = !exercise.IsExpanded;
+
+            foreach (var other in Exercises)
+            {
+                other.IsExpanded = expand && ReferenceEquals(other, exercise);
+            }
+
+            if (expand)
+            {
+                ExerciseExpanded?.Invoke(this, exercise);
+            }
+        }
+
+        [RelayCommand]
+        private Task RemoveWorkingSetAsync(WorkingSetViewModel workingSet, CancellationToken cancellationToken)
+        {
+            return RunAsync(async token =>
+            {
+                var exercise = Exercises.FirstOrDefault(x => x.Id == workingSet.ExerciseSetId);
+
+                if (exercise is null)
+                {
+                    return;
+                }
+
+                await SendAsync(
+                    new RemovePerformedWorkingSetCommand(_workoutId, workingSet.ExerciseSetId, workingSet.Index),
+                    token);
+
+                exercise.Remove(workingSet);
+
+                Refresh();
+            }, cancellationToken);
+        }
+
+        [RelayCommand]
+        private Task StartPickingAsync(CancellationToken cancellationToken)
+        {
+            return RunAsync(async token =>
+            {
+                var used = Exercises.Select(x => x.ExerciseId).ToHashSet();
+
+                var exercises = (await QueryAsync(new GetExercisesQuery(), token))
+                    .Exercises
+                    .Where(x => !used.Contains(x.Id))
+                    .Select(ExerciseRowViewModel.From);
+
+                PickerExercises.Clear();
+
+                foreach (var exercise in exercises)
+                {
+                    PickerExercises.Add(exercise);
+                }
+
+                IsPicking = true;
+            }, cancellationToken);
+        }
+
+        [RelayCommand]
+        private void CancelPicking()
+        {
+            IsPicking = false;
+        }
+
+        [RelayCommand]
+        private Task PickExerciseAsync(ExerciseRowViewModel exercise, CancellationToken cancellationToken)
+        {
+            return RunAsync(async token =>
+            {
+                IsPicking = false;
+
+                var added = await SendAsync(
+                    new AddPerformedExerciseSetCommand(
+                        _workoutId,
+                        exercise.Id,
+                        AddedSets,
+                        AddedReps,
+                        AddedWeight),
+                    token);
+
+                await LoadCoreAsync(added.ExerciseSetId, token);
+
+                var target = Exercises.FirstOrDefault(x => x.Id == added.ExerciseSetId);
+
+                if (target is not null)
+                {
+                    ExerciseExpanded?.Invoke(this, target);
+                }
+            }, cancellationToken);
         }
 
         [RelayCommand]

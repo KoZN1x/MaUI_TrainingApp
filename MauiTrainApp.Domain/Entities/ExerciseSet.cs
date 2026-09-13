@@ -62,12 +62,9 @@ namespace MauiTrainApp.Domain.Entities
             SetUpdatedTime();
         }
 
-        public void RemoveWorkingSet(WorkingSet workingSet)
+        public void RemoveWorkingSetAt(int index)
         {
-            if (!_workingSets.Remove(workingSet))
-            {
-                throw new InvariantException("Working set was not found in the collection");
-            }
+            _workingSets.RemoveAt(EnsureIndex(index));
 
             SetUpdatedTime();
         }

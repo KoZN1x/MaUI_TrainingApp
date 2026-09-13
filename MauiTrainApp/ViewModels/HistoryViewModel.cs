@@ -7,6 +7,7 @@ using MauiTrainApp.Domain.ReadModels;
 using MauiTrainApp.ExceptionHandler.Interfaces;
 using MauiTrainApp.Formatting;
 using MauiTrainApp.Navigation.Interfaces;
+using MauiTrainApp.Services.Interfaces;
 using MauiTrainApp.Startup;
 using MauiTrainApp.ViewModels.Base;
 using MauiTrainApp.ViewModels.Items;
@@ -18,6 +19,7 @@ namespace MauiTrainApp.ViewModels
     {
         private readonly AppStartup _startup;
         private readonly INavigator _navigator;
+        private readonly IBackupService _backups;
 
         [ObservableProperty]
         private string _workoutCountText = "0";
@@ -35,11 +37,13 @@ namespace MauiTrainApp.ViewModels
             IServiceScopeFactory scopeFactory,
             IExceptionPresenter exceptionPresenter,
             AppStartup startup,
-            INavigator navigator)
+            INavigator navigator,
+            IBackupService backups)
             : base(scopeFactory, exceptionPresenter)
         {
             _startup = startup;
             _navigator = navigator;
+            _backups = backups;
         }
 
         public ObservableCollection<WorkoutMonthViewModel> Months { get; } = [];
@@ -63,6 +67,12 @@ namespace MauiTrainApp.ViewModels
 
                 IsEmpty = workouts.Count == 0;
             }, cancellationToken);
+        }
+
+        [RelayCommand]
+        private Task SaveBackupAsync(CancellationToken cancellationToken)
+        {
+            return RunAsync(token => _backups.ShareAsync(token), cancellationToken);
         }
 
         [RelayCommand]

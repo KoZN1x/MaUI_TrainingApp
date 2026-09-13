@@ -23,6 +23,11 @@
             Icon="tab_plans.png"
             Route="plans" />
         <ShellContent
+            Title="Прогресс"
+            ContentTemplate="{DataTemplate views:ProgressPage}"
+            Icon="tab_progress.png"
+            Route="stats" />
+        <ShellContent
             Title="История"
             ContentTemplate="{DataTemplate views:HistoryPage}"
             Icon="tab_history.png"

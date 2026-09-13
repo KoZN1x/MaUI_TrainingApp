@@ -36,6 +36,10 @@
                 Command="{Binding CreatePlanCommand}"
                 Style="{StaticResource PrimaryButton}"
                 Text="Создать план" />
+            <Button
+                Command="{Binding OpenExercisesCommand}"
+                Style="{StaticResource GhostButton}"
+                Text="Каталог упражнений" />
         </VerticalStackLayout>
 
         <RefreshView
@@ -111,6 +115,11 @@
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>
+
+                    <Button
+                        Command="{Binding OpenExercisesCommand}"
+                        Style="{StaticResource SecondaryButton}"
+                        Text="Каталог упражнений" />
 
                 </VerticalStackLayout>
             </ScrollView>

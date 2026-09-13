@@ -32,6 +32,10 @@
                 HorizontalTextAlignment="Center"
                 Style="{StaticResource Muted}"
                 Text="Начните тренировку по плану — она появится здесь" />
+            <Button
+                Command="{Binding SaveBackupCommand}"
+                Style="{StaticResource GhostButton}"
+                Text="Сохранить копию базы" />
         </VerticalStackLayout>
 
         <RefreshView
@@ -112,6 +116,11 @@
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>
+
+                    <Button
+                        Command="{Binding SaveBackupCommand}"
+                        Style="{StaticResource SecondaryButton}"
+                        Text="Сохранить копию базы" />
 
                 </VerticalStackLayout>
             </ScrollView>

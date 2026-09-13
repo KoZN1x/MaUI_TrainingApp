@@ -58,13 +58,33 @@
                             <Border Style="{StaticResource Card}">
                                 <VerticalStackLayout Spacing="{StaticResource Space3}">
 
-                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space3}">
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="{StaticResource Space2}">
                                         <Label
+                                            Style="{StaticResource Muted}"
+                                            Text="{Binding Number}"
+                                            VerticalOptions="Center"
+                                            WidthRequest="14" />
+                                        <Label
+                                            Grid.Column="1"
                                             Style="{StaticResource CardTitle}"
                                             Text="{Binding Name}"
                                             VerticalOptions="Center" />
                                         <Button
-                                            Grid.Column="1"
+                                            Grid.Column="2"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PlanEditorViewModel}}, Path=MoveExerciseUpCommand}"
+                                            CommandParameter="{Binding .}"
+                                            IsEnabled="{Binding CanMoveUp}"
+                                            Style="{StaticResource StepButtonSmall}"
+                                            Text="↑" />
+                                        <Button
+                                            Grid.Column="3"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PlanEditorViewModel}}, Path=MoveExerciseDownCommand}"
+                                            CommandParameter="{Binding .}"
+                                            IsEnabled="{Binding CanMoveDown}"
+                                            Style="{StaticResource StepButtonSmall}"
+                                            Text="↓" />
+                                        <Button
+                                            Grid.Column="4"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PlanEditorViewModel}}, Path=RemoveExerciseCommand}"
                                             CommandParameter="{Binding .}"
                                             Style="{StaticResource GhostButton}"
@@ -84,7 +104,7 @@
                                             CommandParameter="{Binding .}"
                                             Style="{StaticResource StepButton}"
                                             Text="−" />
-                                        <Entry
+                                        <controls:NumericEntry
                                             Grid.Column="2"
                                             Completed="OnPlannedEntryCompleted"
                                             Style="{StaticResource NumberEntry}"
@@ -111,7 +131,7 @@
                                             CommandParameter="{Binding .}"
                                             Style="{StaticResource StepButton}"
                                             Text="−" />
-                                        <Entry
+                                        <controls:NumericEntry
                                             Grid.Column="2"
                                             Completed="OnPlannedEntryCompleted"
                                             Style="{StaticResource NumberEntry}"
@@ -138,7 +158,7 @@
                                             CommandParameter="{Binding .}"
                                             Style="{StaticResource StepButton}"
                                             Text="−" />
-                                        <Entry
+                                        <controls:NumericEntry
                                             Grid.Column="2"
                                             Completed="OnPlannedEntryCompleted"
                                             Style="{StaticResource NumberEntry}"

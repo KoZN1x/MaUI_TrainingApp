@@ -19,7 +19,8 @@ namespace MauiTrainApp.Infrastructure.Mappers
             var workout = new Workout(
                 record.WorkoutDay,
                 record.ExerciseSets
-                    .OrderBy(x => x.CreatedAt)
+                    .OrderBy(x => x.Position)
+                    .ThenBy(x => x.CreatedAt)
                     .ThenBy(x => x.Id)
                     .Select(_exerciseSetRecordMapper.ToDomain),
                 record.TrainingPlanRecordId,
@@ -52,7 +53,7 @@ namespace MauiTrainApp.Infrastructure.Mappers
                 DurationSeconds = entity.Duration is null ? null : (int)entity.Duration.Value.TotalSeconds,
                 StartedAt = entity.StartedAt,
                 ExerciseSets = entity.ExerciseSets
-                    .Select(x => _exerciseSetRecordMapper.ToRecord(x, parent))
+                    .Select((x, index) => _exerciseSetRecordMapper.ToRecord(x, parent) with { Position = index })
                     .ToList()
             };
         }

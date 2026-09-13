@@ -28,7 +28,7 @@ namespace MauiTrainApp.Navigation
         public Task GoToExerciseDetailsAsync(Guid exerciseId) =>
             GoToAsync(AppRoutes.ExerciseDetails, AppRoutes.ExerciseIdParameter, exerciseId);
 
-        public Task GoToProgressAsync() => GoToAsync(AppRoutes.Progress);
+        public Task GoToProgressAsync() => GoToAsync(AppRoutes.Tab(AppRoutes.Progress));
 
         public Task GoBackAsync() => GoToAsync("..");
 

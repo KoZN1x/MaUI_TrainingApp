@@ -23,6 +23,7 @@ namespace MauiTrainApp.DI
                     .AddSingleton<AppStartup>()
                     .AddSingleton<IDialogService, DialogService>()
                     .AddSingleton<IAppSettings, AppSettings>()
+                    .AddSingleton<IBackupService, BackupService>()
                     .AddTransient<IWorkoutClock, WorkoutClock>()
                     .AddViewModels()
                     .AddPages();

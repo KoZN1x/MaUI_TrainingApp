@@ -116,7 +116,8 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
                             exerciseSet.ExerciseRecordId,
                             exerciseSet.Exercise.Name,
                             exerciseSet.WorkingSets,
-                            exerciseSet.CreatedAt))
+                            exerciseSet.CreatedAt,
+                            exerciseSet.Position))
                         .ToList()
                 })
                 .FirstOrDefaultAsync(cancellationToken);

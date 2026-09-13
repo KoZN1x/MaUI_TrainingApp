@@ -8,14 +8,16 @@ namespace MauiTrainApp.Infrastructure.Repositories.Read
         Guid ExerciseId,
         string ExerciseName,
         ICollection<WorkingSet> WorkingSets,
-        DateTimeOffset CreatedAt);
+        DateTimeOffset CreatedAt,
+        int Position);
 
     internal static class ExerciseSetRowExtensions
     {
         public static IReadOnlyCollection<ExerciseSetReadModel> ToReadModels(this IEnumerable<ExerciseSetRow> rows)
         {
             return rows
-                .OrderBy(x => x.CreatedAt)
+                .OrderBy(x => x.Position)
+                .ThenBy(x => x.CreatedAt)
                 .ThenBy(x => x.Id)
                 .Select(x => new ExerciseSetReadModel(
                     x.Id,
